@@ -9,14 +9,21 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #cce2d4; /* Light green, typical Monopoly background */
+            background-color: #cce2d4;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Align board to top */
             min-height: 100vh;
             padding: 20px;
             margin: 0;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column; /* Stack board and controls */
+            align-items: center;
+            gap: 20px;
         }
 
         .board {
@@ -25,8 +32,8 @@
             grid-template-rows: 100px repeat(9, 65px) 100px;
             gap: 2px;
             border: 3px solid black;
-            background-color: #f7f7f7; /* Board inner background */
-            width: 802px; /* (100*2 + 65*9 + 2*10) */
+            background-color: #f7f7f7;
+            width: 802px;
             height: 802px;
             position: relative;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
@@ -38,39 +45,67 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Default for top/bottom */
+            justify-content: space-between; /* Distribute space for token container */
             text-align: center;
-            font-size: 9px; /* Default font size */
+            font-size: 9px;
             line-height: 1.2;
             position: relative;
-            padding: 1px; /* Reduced padding */
+            padding: 1px;
             box-sizing: border-box;
-            overflow: hidden; /* Prevent visual overflow from children */
+            overflow: hidden;
         }
+        .space .content { /* Wraps the original content */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70%; /* Adjust as needed */
+        }
+        .space .token-container {
+            width: 100%;
+            height: 30%; /* Space for tokens */
+            display: flex;
+            flex-wrap: wrap; /* Allow tokens to wrap if many */
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 1px;
+        }
+        .player-token {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid black;
+            box-shadow: 0 0 3px rgba(0,0,0,0.5);
+        }
+
 
         .corner {
             font-weight: bold;
             font-size: 14px;
         }
+        .corner .content { height: 80%; } /* More space for corner text */
+        .corner .token-container { height: 20%; }
+
 
         .property .color-bar {
-            height: 15px; /* Reduced height */
+            height: 15px;
             width: 100%;
             border-bottom: 1px solid #333;
-            margin-bottom: 1px; /* Small gap */
+            margin-bottom: 1px;
         }
         .property .name {
-            flex-grow: 1; /* Allow name to take space, especially on sides */
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1px 0;
             font-weight: 500;
-            width: 100%; /* Ensure it uses full width available */
+            width: 100%;
         }
         .property .price {
             font-weight: 600;
-            margin-top: 1px; /* Small gap */
+            margin-top: 1px;
         }
 
         /* Property specific styles */
@@ -126,50 +161,43 @@
         .space-park-lane { grid-column: 11; grid-row: 8; }
         .space-super-tax { grid-column: 11; grid-row: 9; }
         .space-mayfair { grid-column: 11; grid-row: 10; }
-/* Styling for text elements on side properties */
-        .left-col .name, .right-col .name,
-        .left-col .price, .right-col .price,
-        .left-col.space > div:not(.color-bar):not(.name):not(.price), /* For stations/utilities text */
-        .right-col.space > div:not(.color-bar):not(.name):not(.price) {
+
+        .left-col .content .name, .right-col .content .name,
+        .left-col .content .price, .right-col .content .price,
+        .left-col.space .content > div:not(.color-bar):not(.name):not(.price),
+        .right-col.space .content > div:not(.color-bar):not(.name):not(.price) {
             font-size: 7.5px;
             line-height: 1.1;
         }
         
-        .left-col .name, .right-col .name {
+        .left-col .content .name, .right-col .content .name {
             text-align: center;
-            white-space: normal; /* To respect <br> tags */
-            width: 22px; /* Unrotated width: enough for 2 lines of 7.5px text. Becomes thickness. */
-            /* flex-grow: 1; is inherited from .property .name, crucial */
+            white-space: normal;
+            width: 22px;
             margin: 1px 0;
         }
 
-        .left-col.property .name, .left-col.space .station-icon + div, .left-col.space .utility-icon + div, .left-col.space .tax-icon + div, .left-col.space .chance-icon + div, .left-col.space .community-chest-icon + div {
+        .left-col.property .content .name, .left-col.space .content .station-icon + div, .left-col.space .content .utility-icon + div, .left-col.space .content .tax-icon + div, .left-col.space .content .chance-icon + div, .left-col.space .content .community-chest-icon + div {
             transform: rotate(90deg);
         }
-        .right-col.property .name, .right-col.space .station-icon + div, .right-col.space .utility-icon + div, .right-col.space .tax-icon + div, .right-col.space .chance-icon + div, .right-col.space .community-chest-icon + div {
+        .right-col.property .content .name, .right-col.space .content .station-icon + div, .right-col.space .content .utility-icon + div, .right-col.space .content .tax-icon + div, .right-col.space .content .chance-icon + div, .right-col.space .content .community-chest-icon + div {
             transform: rotate(-90deg);
         }
-        /* Ensure price is not rotated if .name is specific */
-         .left-col .price, .right-col .price {
-            transform: none !important; /* Price itself should not be rotated again */
+         .left-col .content .price, .right-col .content .price {
+            transform: none !important;
          }
 
-
-        .top-row.property .name, .top-row.space .station-icon + div, .top-row.space .utility-icon + div { /* Targeting text below icon */
+        .top-row.property .content .name, .top-row.space .content .station-icon + div, .top-row.space .content .utility-icon + div {
              transform: rotate(180deg);
         }
-         .top-row .price {
+         .top-row .content .price {
             transform: rotate(180deg);
          }
 
-
-        /* Corner specific text adjustments */
         .space-jail .just { position: absolute; top: 15px; left: 5px; transform: rotate(45deg); font-size: 10px;}
         .space-jail .visiting { position: absolute; bottom: 15px; right: 5px; transform: rotate(45deg); font-size: 10px;}
         .space-go .arrow { font-size: 30px; color: #d60000; line-height: 1; }
 
-
-        /* Center Area */
         .center-area {
             grid-column: 2 / span 9;
             grid-row: 2 / span 9;
@@ -206,7 +234,6 @@
             width: 100%;
         }
 
-        /* Color definitions */
         .brown { background-color: #955436; }
         .light-blue { background-color: #aae0fa; }
         .pink { background-color: #d93a96; }
@@ -216,9 +243,8 @@
         .green { background-color: #1fb25a; }
         .dark-blue { background-color: #0072bb; }
 
-        /* Utility and Station Icons */
         .station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon {
-            font-size: 20px; /* Slightly smaller icons */
+            font-size: 20px;
             margin-bottom: 3px;
         }
         .station-icon::before { content: "🚂"; }
@@ -229,225 +255,560 @@
         .chance-icon::before { content: "❓"; }
         .community-chest-icon::before { content: "🎁"; }
 
+        /* Game Controls & Player Info Area */
+        .game-controls {
+            background-color: #f0e6d2; /* Creamy background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 800px; /* Match board width */
+            margin-top: 20px;
+            text-align: center;
+        }
+        .player-info-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .player-info {
+            background-color: #fff;
+            border: 2px solid #ccc;
+            padding: 10px 15px;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: left;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
+        .player-info.active-player {
+            border-color: #d60000; /* Highlight active player */
+            box-shadow: 0 0 10px #d60000;
+        }
+        .player-info h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+        }
+        .dice-area {
+            margin: 15px 0;
+        }
+        .dice-area span {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border: 1px solid #333;
+            background-color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+        #rollDiceButton {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #rollDiceButton:hover {
+            background-color: #45a049;
+        }
+        #rollDiceButton:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message-log {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 50px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
     </style>
-    </head>
+</head>
 <body>
-    <div class="board">
-        <div class="space corner space-go-to-jail">
-            <div>GO TO</div>
-            <div style="font-size: 30px;">🚓</div>
-            <div>JAIL</div>
-        </div>
-
-        <div class="space property top-row space-strand">
-            <div class="color-bar red"></div>
-            <div class="name">STRAND</div>
-            <div class="price">£220</div>
-        </div>
-        <div class="space top-row space-chance-top">
-            <div class="chance-icon"></div>
-            <div>CHANCE</div>
-        </div>
-        <div class="space property top-row space-fleet-street">
-            <div class="color-bar red"></div>
-            <div class="name">FLEET STREET</div>
-            <div class="price">£220</div>
-        </div>
-        <div class="space property top-row space-trafalgar-square">
-            <div class="color-bar red"></div>
-            <div class="name">TRAFALGAR SQUARE</div>
-            <div class="price">£240</div>
-        </div>
-        <div class="space top-row space-fenchurch-st-station">
-            <div class="station-icon"></div>
-            <div>FENCHURCH ST.<br>STATION</div>
-            <div class="price">£200</div>
-        </div>
-        <div class="space property top-row space-leicester-square">
-            <div class="color-bar yellow"></div>
-            <div class="name">LEICESTER SQUARE</div>
-            <div class="price">£260</div>
-        </div>
-        <div class="space property top-row space-coventry-street">
-            <div class="color-bar yellow"></div>
-            <div class="name">COVENTRY STREET</div>
-            <div class="price">£260</div>
-        </div>
-        <div class="space top-row space-water-works">
-            <div class="utility-icon water"></div>
-            <div>WATER WORKS</div>
-            <div class="price">£150</div>
-        </div>
-        <div class="space property top-row space-piccadilly">
-            <div class="color-bar yellow"></div>
-            <div class="name">PICCADILLY</div>
-            <div class="price">£280</div>
-        </div>
-
-        <div class="space corner space-free-parking">
-            <div>FREE</div>
-            <div style="font-size: 30px;">🅿️</div>
-            <div>PARKING</div>
-        </div>
-
-        <div class="space property left-col space-vine-street">
-            <div class="color-bar orange"></div>
-            <div class="name">VINE STREET</div>
-            <div class="price">£200</div>
-        </div>
-        <div class="space property left-col space-marlborough-street">
-            <div class="color-bar orange"></div>
-            <div class="name">MARLBOROUGH STREET</div>
-            <div class="price">£180</div>
-        </div>
-        <div class="space left-col space-community-chest-left">
-            <div class="community-chest-icon"></div>
-            <div>COMMUNITY CHEST</div>
-        </div>
-        <div class="space property left-col space-bow-street">
-            <div class="color-bar orange"></div>
-            <div class="name">BOW STREET</div>
-            <div class="price">£180</div>
-        </div>
-        <div class="space left-col space-marylebone-station">
-             <div class="station-icon"></div>
-            <div>MARYLEBONE STATION</div>
-            <div class="price">£200</div>
-        </div>
-        <div class="space property left-col space-northumberland-avenue">
-            <div class="color-bar pink"></div>
-            <div class="name">NORTHUMBERLAND<br>AVENUE</div>
-            <div class="price">£160</div>
-        </div>
-        <div class="space property left-col space-whitehall">
-            <div class="color-bar pink"></div>
-            <div class="name">WHITEHALL</div>
-            <div class="price">£140</div>
-        </div>
-        <div class="space left-col space-electric-company">
-            <div class="utility-icon electric"></div>
-            <div>ELECTRIC COMPANY</div>
-            <div class="price">£150</div>
-        </div>
-        <div class="space property left-col space-pall-mall">
-            <div class="color-bar pink"></div>
-            <div class="name">PALL MALL</div>
-            <div class="price">£140</div>
-        </div>
-
-        <div class="space corner space-jail">
-            <div class="just">JUST</div>
-            <div style="font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;">👮</div>
-            <div class="visiting">VISITING</div>
-        </div>
-
-        <div class="space property space-pentonville-road">
-            <div class="color-bar light-blue"></div>
-            <div class="name">PENTONVILLE ROAD</div>
-            <div class="price">£120</div>
-        </div>
-        <div class="space property space-euston-road">
-            <div class="color-bar light-blue"></div>
-            <div class="name">EUSTON ROAD</div>
-            <div class="price">£100</div>
-        </div>
-        <div class="space space-chance-bottom">
-            <div class="chance-icon"></div>
-            <div>CHANCE</div>
-        </div>
-        <div class="space property space-the-angel-islington">
-            <div class="color-bar light-blue"></div>
-            <div class="name">THE ANGEL,<br>ISLINGTON</div>
-            <div class="price">£100</div>
-        </div>
-        <div class="space space-kings-cross">
-            <div class="station-icon"></div>
-            <div>KING'S CROSS STATION</div>
-            <div class="price">£200</div>
-        </div>
-        <div class="space space-income-tax">
-            <div class="tax-icon income"></div>
-            <div>INCOME TAX</div>
-            <div>PAY £200</div>
-        </div>
-        <div class="space property space-whitechapel-road">
-            <div class="color-bar brown"></div>
-            <div class="name">WHITECHAPEL ROAD</div>
-            <div class="price">£60</div>
-        </div>
-        <div class="space space-community-chest-bottom">
-            <div class="community-chest-icon"></div>
-            <div>COMMUNITY CHEST</div>
-        </div>
-        <div class="space property space-old-kent-road">
-            <div class="color-bar brown"></div>
-            <div class="name">OLD KENT ROAD</div>
-            <div class="price">£60</div>
-        </div>
-
-        <div class="space corner space-go">
-            <div>COLLECT £200 SALARY AS YOU PASS</div>
-            <div class="arrow">➔</div>
-            <div>GO</div>
-        </div>
-
-        <div class="space property right-col space-mayfair">
-            <div class="color-bar dark-blue"></div>
-            <div class="name">MAYFAIR</div>
-            <div class="price">£400</div>
-        </div>
-        <div class="space right-col space-super-tax">
-            <div class="tax-icon super"></div>
-            <div>SUPER TAX</div>
-            <div>PAY £100</div>
-        </div>
-        <div class="space property right-col space-park-lane">
-            <div class="color-bar dark-blue"></div>
-            <div class="name">PARK LANE</div>
-            <div class="price">£350</div>
-        </div>
-        <div class="space right-col space-chance-right">
-            <div class="chance-icon"></div>
-            <div>CHANCE</div>
-        </div>
-        <div class="space right-col space-liverpool-st-station">
-            <div class="station-icon"></div>
-            <div>LIVERPOOL ST.<br>STATION</div>
-            <div class="price">£200</div>
-        </div>
-        <div class="space property right-col space-bond-street">
-            <div class="color-bar green"></div>
-            <div class="name">BOND STREET</div>
-            <div class="price">£320</div>
-        </div>
-        <div class="space right-col space-community-chest-right">
-            <div class="community-chest-icon"></div>
-            <div>COMMUNITY CHEST</div>
-        </div>
-        <div class="space property right-col space-oxford-street">
-            <div class="color-bar green"></div>
-            <div class="name">OXFORD STREET</div>
-            <div class="price">£300</div>
-        </div>
-        <div class="space property right-col space-regent-street">
-            <div class="color-bar green"></div>
-            <div class="name">REGENT STREET</div>
-            <div class="price">£300</div>
-        </div>
-
-        <div class="center-area">
-            <div class="game-title">MONOPOLY</div>
-            <div class="card-piles-container">
-                <div class="card-pile-placeholder">CHANCE CARDS</div>
-                <div class="card-pile-placeholder">COMMUNITY CHEST CARDS</div>
+    <div class="game-container">
+        <div class="board">
+            <div id="space-30" class="space corner space-go-to-jail">
+                <div class="content">
+                    <div>GO TO</div>
+                    <div style="font-size: 30px;">🚓</div>
+                    <div>JAIL</div>
+                </div>
+                <div class="token-container"></div>
             </div>
+
+            <div id="space-21" class="space property top-row space-strand">
+                <div class="content">
+                    <div class="color-bar red"></div>
+                    <div class="name">STRAND</div>
+                    <div class="price">£220</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-22" class="space top-row space-chance-top">
+                <div class="content">
+                    <div class="chance-icon"></div>
+                    <div>CHANCE</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-23" class="space property top-row space-fleet-street">
+                <div class="content">
+                    <div class="color-bar red"></div>
+                    <div class="name">FLEET STREET</div>
+                    <div class="price">£220</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-24" class="space property top-row space-trafalgar-square">
+                <div class="content">
+                    <div class="color-bar red"></div>
+                    <div class="name">TRAFALGAR SQUARE</div>
+                    <div class="price">£240</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-25" class="space top-row space-fenchurch-st-station">
+                <div class="content">
+                    <div class="station-icon"></div>
+                    <div>FENCHURCH ST.<br>STATION</div>
+                    <div class="price">£200</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-26" class="space property top-row space-leicester-square">
+                <div class="content">
+                    <div class="color-bar yellow"></div>
+                    <div class="name">LEICESTER SQUARE</div>
+                    <div class="price">£260</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-27" class="space property top-row space-coventry-street">
+                <div class="content">
+                    <div class="color-bar yellow"></div>
+                    <div class="name">COVENTRY STREET</div>
+                    <div class="price">£260</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-28" class="space top-row space-water-works">
+                <div class="content">
+                    <div class="utility-icon water"></div>
+                    <div>WATER WORKS</div>
+                    <div class="price">£150</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-29" class="space property top-row space-piccadilly">
+                <div class="content">
+                    <div class="color-bar yellow"></div>
+                    <div class="name">PICCADILLY</div>
+                    <div class="price">£280</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div id="space-20" class="space corner space-free-parking">
+                <div class="content">
+                    <div>FREE</div>
+                    <div style="font-size: 30px;">🅿️</div>
+                    <div>PARKING</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div id="space-19" class="space property left-col space-vine-street">
+                <div class="content">
+                    <div class="color-bar orange"></div>
+                    <div class="name">VINE STREET</div>
+                    <div class="price">£200</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-18" class="space property left-col space-marlborough-street">
+                <div class="content">
+                    <div class="color-bar orange"></div>
+                    <div class="name">MARLBOROUGH STREET</div>
+                    <div class="price">£180</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-17" class="space left-col space-community-chest-left">
+                <div class="content">
+                    <div class="community-chest-icon"></div>
+                    <div>COMMUNITY CHEST</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-16" class="space property left-col space-bow-street">
+                <div class="content">
+                    <div class="color-bar orange"></div>
+                    <div class="name">BOW STREET</div>
+                    <div class="price">£180</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-15" class="space left-col space-marylebone-station">
+                <div class="content">
+                    <div class="station-icon"></div>
+                    <div>MARYLEBONE STATION</div>
+                    <div class="price">£200</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-14" class="space property left-col space-northumberland-avenue">
+                <div class="content">
+                    <div class="color-bar pink"></div>
+                    <div class="name">NORTHUMBERLAND<br>AVENUE</div>
+                    <div class="price">£160</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-13" class="space property left-col space-whitehall">
+                <div class="content">
+                    <div class="color-bar pink"></div>
+                    <div class="name">WHITEHALL</div>
+                    <div class="price">£140</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-12" class="space left-col space-electric-company">
+                <div class="content">
+                    <div class="utility-icon electric"></div>
+                    <div>ELECTRIC COMPANY</div>
+                    <div class="price">£150</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-11" class="space property left-col space-pall-mall">
+                <div class="content">
+                    <div class="color-bar pink"></div>
+                    <div class="name">PALL MALL</div>
+                    <div class="price">£140</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div id="space-10" class="space corner space-jail">
+                <div class="content">
+                    <div class="just">JUST</div>
+                    <div style="font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;">👮</div>
+                    <div class="visiting">VISITING</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div id="space-9" class="space property space-pentonville-road">
+                <div class="content">
+                    <div class="color-bar light-blue"></div>
+                    <div class="name">PENTONVILLE ROAD</div>
+                    <div class="price">£120</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-8" class="space property space-euston-road">
+                <div class="content">
+                    <div class="color-bar light-blue"></div>
+                    <div class="name">EUSTON ROAD</div>
+                    <div class="price">£100</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-7" class="space space-chance-bottom">
+                <div class="content">
+                    <div class="chance-icon"></div>
+                    <div>CHANCE</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-6" class="space property space-the-angel-islington">
+                <div class="content">
+                    <div class="color-bar light-blue"></div>
+                    <div class="name">THE ANGEL,<br>ISLINGTON</div>
+                    <div class="price">£100</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-5" class="space space-kings-cross">
+                <div class="content">
+                    <div class="station-icon"></div>
+                    <div>KING'S CROSS STATION</div>
+                    <div class="price">£200</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-4" class="space space-income-tax">
+                <div class="content">
+                    <div class="tax-icon income"></div>
+                    <div>INCOME TAX</div>
+                    <div>PAY £200</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-3" class="space property space-whitechapel-road">
+                <div class="content">
+                    <div class="color-bar brown"></div>
+                    <div class="name">WHITECHAPEL ROAD</div>
+                    <div class="price">£60</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-2" class="space space-community-chest-bottom">
+                <div class="content">
+                    <div class="community-chest-icon"></div>
+                    <div>COMMUNITY CHEST</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-1" class="space property space-old-kent-road">
+                <div class="content">
+                    <div class="color-bar brown"></div>
+                    <div class="name">OLD KENT ROAD</div>
+                    <div class="price">£60</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div id="space-0" class="space corner space-go">
+                <div class="content">
+                    <div>COLLECT £200 SALARY AS YOU PASS</div>
+                    <div class="arrow">➔</div>
+                    <div>GO</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div id="space-39" class="space property right-col space-mayfair">
+                <div class="content">
+                    <div class="color-bar dark-blue"></div>
+                    <div class="name">MAYFAIR</div>
+                    <div class="price">£400</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-38" class="space right-col space-super-tax">
+                <div class="content">
+                    <div class="tax-icon super"></div>
+                    <div>SUPER TAX</div>
+                    <div>PAY £100</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-37" class="space property right-col space-park-lane">
+                <div class="content">
+                    <div class="color-bar dark-blue"></div>
+                    <div class="name">PARK LANE</div>
+                    <div class="price">£350</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-36" class="space right-col space-chance-right">
+                <div class="content">
+                    <div class="chance-icon"></div>
+                    <div>CHANCE</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-35" class="space right-col space-liverpool-st-station">
+                <div class="content">
+                    <div class="station-icon"></div>
+                    <div>LIVERPOOL ST.<br>STATION</div>
+                    <div class="price">£200</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-34" class="space property right-col space-bond-street">
+                <div class="content">
+                    <div class="color-bar green"></div>
+                    <div class="name">BOND STREET</div>
+                    <div class="price">£320</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-33" class="space right-col space-community-chest-right">
+                <div class="content">
+                    <div class="community-chest-icon"></div>
+                    <div>COMMUNITY CHEST</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-32" class="space property right-col space-oxford-street">
+                <div class="content">
+                    <div class="color-bar green"></div>
+                    <div class="name">OXFORD STREET</div>
+                    <div class="price">£300</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+            <div id="space-31" class="space property right-col space-regent-street">
+                <div class="content">
+                    <div class="color-bar green"></div>
+                    <div class="name">REGENT STREET</div>
+                    <div class="price">£300</div>
+                </div>
+                <div class="token-container"></div>
+            </div>
+
+            <div class="center-area">
+                <div class="game-title">MONOPOLY</div>
+                <div class="card-piles-container">
+                    <div class="card-pile-placeholder">CHANCE CARDS</div>
+                    <div class="card-pile-placeholder">COMMUNITY CHEST CARDS</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div id="playerInfoContainer" class="player-info-container">
+                </div>
+            <div class="current-player-turn mb-4">
+                Current Turn: <strong id="currentPlayerName">Player 1</strong>
+            </div>
+            <div class="dice-area">
+                Dice: <span id="dice1Display">-</span> <span id="dice2Display">-</span>
+                Total: <strong id="diceTotalDisplay">-</strong>
+            </div>
+            <button id="rollDiceButton">Roll Dice</button>
+            <div id="messageLog" class="message-log">Welcome to Monopoly! Player 1's turn.</div>
         </div>
     </div>
 
     <script>
+        // --- Game Constants ---
+        const TOTAL_SPACES = 40;
+        const PASS_GO_SALARY = 200;
+        const STARTING_MONEY = 1500;
+        const MAX_PLAYERS = 6; // Max players, can be adjusted
+        const PLAYER_COLORS = ['#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FFA500', '#800080']; // Red, Blue, Green, Yellow, Orange, Purple
+
+        // --- Game State Variables ---
+        let players = [];
+        let currentPlayerIndex = 0;
+        let dice = [0, 0];
+        let gameInitialized = false;
+
+      
+
         
+        ];
+
+
+        // --- Game Logic Functions ---
+
+        /**
+         * Initializes the game with a specified number of players.
+         * @param {number} numPlayers - Number of players (2-6).
+         */
+        function initializeGame(numPlayers = 2) {
+            if (gameInitialized) {
+                logMessage("Game already initialized.");
+                return;
+            }
+            players = [];
+            currentPlayerIndex = 0;
+
+            // Clear previous player info and tokens if any
+            playerInfoContainer.innerHTML = '';
+            document.querySelectorAll('.player-token').forEach(token => token.remove());
+
+
+            for (let i = 0; i < numPlayers; i++) {
+                const player = {
+                    id: i,
+                    name: `Player ${i + 1}`,
+                    tokenColor: PLAYER_COLORS[i % PLAYER_COLORS.length],
+                    money: STARTING_MONEY,
+                    currentPosition: 0, // Start at GO (index 0)
+                    properties: [],
+                    inJail: false,
+                    jailTurns: 0,
+                    getOutOfJailFreeCards: 0,
+                    tokenElement: null,
+                    infoElement: null
+                };
+                players.push(player);
+                createPlayerToken(player);
+                createPlayerInfoDisplay(player);
+            }
+            updateAllPlayerInfoDisplays();
+            updateCurrentPlayerDisplay();
+            logMessage(`Monopoly game started with ${numPlayers} players. ${players[0].name}'s turn.`);
+            gameInitialized = true;
+            rollDiceButton.disabled = false;
+        }
+
+        /**
+         * Creates a visual token for a player and adds it to the board.
+         * @param {object} player - The player object.
+         */
+        function createPlayerToken(player) {
+            const token = document.createElement('div');
+            token.classList.add('player-token');
+            token.style.backgroundColor = player.tokenColor;
+            token.setAttribute('title', player.name); // Tooltip for player name
+            player.tokenElement = token;
+            placeTokenOnBoard(player);
+        }
+
+        /**
+         * Creates the UI element to display player's information.
+         * @param {object} player - The player object.
+         */
+        function createPlayerInfoDisplay(player) {
+            const infoDiv = document.createElement('div');
+            infoDiv.classList.add('player-info');
+            infoDiv.id = `player-info-${player.id}`;
+            infoDiv.innerHTML = `
+                <h3 style="color: ${player.tokenColor};">${player.name}</h3>
+                <p>Money: <span class="money-display">£${player.money}</span></p>
+                <p>Position: <span class="position-display">GO</span></p>
+            `;
+            player.infoElement = infoDiv;
+            playerInfoContainer.appendChild(infoDiv);
+        }
+
+        /**
+         * Updates the displayed information for a single player.
+         * @param {object} player - The player object.
+         */
+        function updatePlayerInfoDisplay(player) {
+            if (player.infoElement) {
+                player.infoElement.querySelector('.money-display').textContent = `£${player.money}`;
+                const spaceName = document.getElementById(boardSpaceIds[player.currentPosition]).querySelector('.name, div:not(.token-container):not(.color-bar)')?.textContent.trim() || `Space ${player.currentPosition}`;
+                player.infoElement.querySelector('.position-display').textContent = spaceName.split('\n')[0]; // Take first line if multi-line
+            }
+            // Highlight active player
+            document.querySelectorAll('.player-info').forEach(el => el.classList.remove('active-player'));
+            if (players[currentPlayerIndex] && players[currentPlayerIndex].infoElement) {
+                players[currentPlayerIndex].infoElement.classList.add('active-player');
+            }
+        }
+
+        
+        // --- Event Listeners ---
+        rollDiceButton.addEventListener('click', handlePlayerTurn);
+
+        
+
+            initializeGame(2); // Start with 2 players
+        };
+
     </script>
-
-
-        </body>
+</body>
 </html>
