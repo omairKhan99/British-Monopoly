@@ -211,8 +211,8 @@
             <div class="center-area">
                 <div class="game-title">MONOPOLY</div>
                 <div class="card-piles-container">
-                    <div class="card-pile-placeholder">CHANCE CARDS</div>
-                    <div class="card-pile-placeholder">COMMUNITY CHEST CARDS</div>
+                    <div id="chanceCardPile" class="card-pile-placeholder">CHANCE</div>
+                    <div id="communityChestCardPile" class="card-pile-placeholder">COMMUNITY CHEST</div>
                 </div>
             </div>
         </div>
@@ -245,10 +245,20 @@
         const TOTAL_SPACES = 40;
         const PASS_GO_SALARY = 200;
         const STARTING_MONEY = 1500;
-        const MAX_PLAYERS = 6;
+       
         const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕'];
         const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E'];
-        const JAIL_POSITION = 10; // Index of Jail space
+        const JAIL_POSITION = 10; 
+        const GO_POSITION = 0;
+        const KINGS_CROSS_POSITION = 5;
+        const MARYLEBONE_POSITION = 15;
+        const FENCHURCH_ST_POSITION = 25;
+        const LIVERPOOL_ST_POSITION = 35;
+        const PALL_MALL_POSITION = 11;
+        const MAYFAIR_POSITION = 39;
+        const TRAFALGAR_SQ_POSITION = 24;
+        const ELECTRIC_COMPANY_POSITION = 12;
+        const WATER_WORKS_POSITION = 28;
 
         // --- Game State Variables ---
         let players = [];
