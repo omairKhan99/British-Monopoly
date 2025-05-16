@@ -72,19 +72,23 @@
             padding: 1px;
         }
         .player-token {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            border: 1px solid black;
-            box-shadow: 0 0 3px rgba(0,0,0,0.5);
+            width: 22px;  
+            height: 22px; 
+            font-size: 18px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.2); 
+            border-radius: 4px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            line-height: 1; 
         }
-
 
         .corner {
             font-weight: bold;
             font-size: 14px;
         }
-        .corner .content { height: 80%; } /* More space for corner text */
+        .corner .content { height: 80%; } 
         .corner .token-container { height: 20%; }
 
 
@@ -337,7 +341,8 @@
             text-align: left;
             font-size: 0.9em;
         }
-  </style>
+
+    </style>
 </head>
 <body>
     <div class="game-container">
@@ -687,13 +692,16 @@
             <div id="messageLog" class="message-log">Welcome to Monopoly! Player 1's turn.</div>
         </div>
     </div>
-<script>
-        // --- Game Constants ---
+
+    <script>
+       
         const TOTAL_SPACES = 40;
         const PASS_GO_SALARY = 200;
         const STARTING_MONEY = 1500;
-        const MAX_PLAYERS = 6; // Max players, can be adjusted
-        const PLAYER_COLORS = ['#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FFA500', '#800080']; // Red, Blue, Green, Yellow, Orange, Purple
+        const MAX_PLAYERS = 6; 
+        const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕']; // Horse, Leopard, Elephant, Tiger, Monkey, Dog
+        const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E']; 
+        
 
         // --- Game State Variables ---
         let players = [];
@@ -710,51 +718,15 @@
         const playerInfoContainer = document.getElementById('playerInfoContainer');
         const messageLog = document.getElementById('messageLog');
 
-        // Board space IDs in order of play (0-39)
-        // These IDs must match the IDs assigned to the .space divs in HTML
         const boardSpaceIds = [
-            'space-0',  // GO
-            'space-1',  // Old Kent Road
-            'space-2',  // Community Chest (Bottom)
-            'space-3',  // Whitechapel Road
-            'space-4',  // Income Tax
-            'space-5',  // King's Cross Station
-            'space-6',  // The Angel, Islington
-            'space-7',  // Chance (Bottom)
-            'space-8',  // Euston Road
-            'space-9',  // Pentonville Road
-            'space-10', // Jail
-            'space-11', // Pall Mall
-            'space-12', // Electric Company
-            'space-13', // Whitehall
-            'space-14', // Northumberland Avenue
-            'space-15', // Marylebone Station
-            'space-16', // Bow Street
-            'space-17', // Community Chest (Left)
-            'space-18', // Marlborough Street
-            'space-19', // Vine Street
-            'space-20', // Free Parking
-            'space-21', // Strand
-            'space-22', // Chance (Top)
-            'space-23', // Fleet Street
-            'space-24', // Trafalgar Square
-            'space-25', // Fenchurch St. Station
-            'space-26', // Leicester Square
-            'space-27', // Coventry Street
-            'space-28', // Water Works
-            'space-29', // Piccadilly
-            'space-30', // Go To Jail
-            'space-31', // Regent Street
-            'space-32', // Oxford Street
-            'space-33', // Community Chest (Right)
-            'space-34', // Bond Street
-            'space-35', // Liverpool St. Station
-            'space-36', // Chance (Right)
-            'space-37', // Park Lane
-            'space-38', // Super Tax
-            'space-39'  // Mayfair
+            'space-0', 'space-1', 'space-2', 'space-3', 'space-4', 'space-5', 'space-6', 'space-7', 'space-8', 'space-9',
+            'space-10', 'space-11', 'space-12', 'space-13', 'space-14', 'space-15', 'space-16', 'space-17', 'space-18', 'space-19',
+            'space-20', 'space-21', 'space-22', 'space-23', 'space-24', 'space-25', 'space-26', 'space-27', 'space-28', 'space-29',
+            'space-30', 'space-31', 'space-32', 'space-33', 'space-34', 'space-35', 'space-36', 'space-37', 'space-38', 'space-39'
         ];
-// --- Game Logic Functions ---
+
+
+        // --- Game Logic Functions ---
 
         /**
          * Initializes the game with a specified number of players.
@@ -995,6 +967,3 @@
     </script>
 </body>
 </html>
-
-
-
