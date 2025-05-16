@@ -13,15 +13,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align board to top */
+            justify-content: flex-start;
             min-height: 100vh;
             padding: 20px;
             margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll if modal peeks */
         }
 
         .game-container {
             display: flex;
-            flex-direction: column; /* Stack board and controls */
+            flex-direction: column;
             align-items: center;
             gap: 20px;
         }
@@ -45,7 +46,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between; /* Distribute space for token container */
+            justify-content: space-between;
             text-align: center;
             font-size: 9px;
             line-height: 1.2;
@@ -54,34 +55,47 @@
             box-sizing: border-box;
             overflow: hidden;
         }
-        .space .content { /* Wraps the original content */
+        .space .content {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 70%; /* Adjust as needed */
+            height: 70%;
+            width: 100%; /* Ensure content takes full width */
         }
         .space .token-container {
             width: 100%;
-            height: 30%; /* Space for tokens */
+            height: 25%; /* Slightly reduced to make space for owner marker */
             display: flex;
-            flex-wrap: wrap; /* Allow tokens to wrap if many */
+            flex-wrap: wrap;
             align-items: center;
             justify-content: center;
             gap: 2px;
             padding: 1px;
         }
         .player-token {
-            width: 22px;  /* Adjusted for emoji size */
-            height: 22px; /* Adjusted for emoji size */
-            font-size: 18px; /* Emoji size */
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(0,0,0,0.2); /* Lighter border */
-            border-radius: 4px; /* Slightly rounded square */
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 4px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            line-height: 1; /* Ensure emoji is vertically centered */
+            line-height: 1;
+        }
+        .owner-marker-container {
+            height: 5%; /* Space for owner marker */
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Place marker at the bottom of its container */
+        }
+        .owner-marker {
+            width: 80%;
+            height: 5px; /* Height of the color strip */
+            border-top: 1px solid black; /* Optional: border for the marker */
         }
 
 
@@ -89,7 +103,7 @@
             font-weight: bold;
             font-size: 14px;
         }
-        .corner .content { height: 80%; } /* More space for corner text */
+        .corner .content { height: 80%; }
         .corner .token-container { height: 20%; }
 
 
@@ -113,474 +127,111 @@
             margin-top: 1px;
         }
 
-        /* Property specific styles */
-        .row-1 { grid-row: 1; }
-        .row-11 { grid-row: 11; }
-        .col-1 { grid-column: 1; }
-        .col-11 { grid-column: 11; }
+        /* Grid position styles (space-go, space-old-kent-road etc.) remain the same */
+        .row-1 { grid-row: 1; } .row-11 { grid-row: 11; } .col-1 { grid-column: 1; } .col-11 { grid-column: 11; }
+        .space-go { grid-column: 11; grid-row: 11; } .space-old-kent-road { grid-column: 10; grid-row: 11; } .space-community-chest-bottom { grid-column: 9; grid-row: 11; } .space-whitechapel-road { grid-column: 8; grid-row: 11; } .space-income-tax { grid-column: 7; grid-row: 11; } .space-kings-cross { grid-column: 6; grid-row: 11; } .space-the-angel-islington { grid-column: 5; grid-row: 11; } .space-chance-bottom { grid-column: 4; grid-row: 11; } .space-euston-road { grid-column: 3; grid-row: 11; } .space-pentonville-road { grid-column: 2; grid-row: 11; } .space-jail { grid-column: 1; grid-row: 11; }
+        .space-pall-mall { grid-column: 1; grid-row: 10; } .space-electric-company { grid-column: 1; grid-row: 9; } .space-whitehall { grid-column: 1; grid-row: 8; } .space-northumberland-avenue { grid-column: 1; grid-row: 7; } .space-marylebone-station { grid-column: 1; grid-row: 6; } .space-bow-street { grid-column: 1; grid-row: 5; } .space-community-chest-left { grid-column: 1; grid-row: 4; } .space-marlborough-street { grid-column: 1; grid-row: 3; } .space-vine-street { grid-column: 1; grid-row: 2; } .space-free-parking { grid-column: 1; grid-row: 1; }
+        .space-strand { grid-column: 2; grid-row: 1; } .space-chance-top { grid-column: 3; grid-row: 1; } .space-fleet-street { grid-column: 4; grid-row: 1; } .space-trafalgar-square { grid-column: 5; grid-row: 1; } .space-fenchurch-st-station { grid-column: 6; grid-row: 1; } .space-leicester-square { grid-column: 7; grid-row: 1; } .space-coventry-street { grid-column: 8; grid-row: 1; } .space-water-works { grid-column: 9; grid-row: 1; } .space-piccadilly { grid-column: 10; grid-row: 1; } .space-go-to-jail { grid-column: 11; grid-row: 1; }
+        .space-regent-street { grid-column: 11; grid-row: 2; } .space-oxford-street { grid-column: 11; grid-row: 3; } .space-community-chest-right { grid-column: 11; grid-row: 4; } .space-bond-street { grid-column: 11; grid-row: 5; } .space-liverpool-st-station { grid-column: 11; grid-row: 6; } .space-chance-right { grid-column: 11; grid-row: 7; } .space-park-lane { grid-column: 11; grid-row: 8; } .space-super-tax { grid-column: 11; grid-row: 9; } .space-mayfair { grid-column: 11; grid-row: 10; }
 
-        /* Bottom Row */
-        .space-go { grid-column: 11; grid-row: 11; }
-        .space-old-kent-road { grid-column: 10; grid-row: 11; }
-        .space-community-chest-bottom { grid-column: 9; grid-row: 11; }
-        .space-whitechapel-road { grid-column: 8; grid-row: 11; }
-        .space-income-tax { grid-column: 7; grid-row: 11; }
-        .space-kings-cross { grid-column: 6; grid-row: 11; }
-        .space-the-angel-islington { grid-column: 5; grid-row: 11; }
-        .space-chance-bottom { grid-column: 4; grid-row: 11; }
-        .space-euston-road { grid-column: 3; grid-row: 11; }
-        .space-pentonville-road { grid-column: 2; grid-row: 11; }
-        .space-jail { grid-column: 1; grid-row: 11; }
-
-        /* Left Column */
-        .space-pall-mall { grid-column: 1; grid-row: 10; }
-        .space-electric-company { grid-column: 1; grid-row: 9; }
-        .space-whitehall { grid-column: 1; grid-row: 8; }
-        .space-northumberland-avenue { grid-column: 1; grid-row: 7; }
-        .space-marylebone-station { grid-column: 1; grid-row: 6; }
-        .space-bow-street { grid-column: 1; grid-row: 5; }
-        .space-community-chest-left { grid-column: 1; grid-row: 4; }
-        .space-marlborough-street { grid-column: 1; grid-row: 3; }
-        .space-vine-street { grid-column: 1; grid-row: 2; }
-        .space-free-parking { grid-column: 1; grid-row: 1; }
-
-        /* Top Row */
-        .space-strand { grid-column: 2; grid-row: 1; }
-        .space-chance-top { grid-column: 3; grid-row: 1; }
-        .space-fleet-street { grid-column: 4; grid-row: 1; }
-        .space-trafalgar-square { grid-column: 5; grid-row: 1; }
-        .space-fenchurch-st-station { grid-column: 6; grid-row: 1; }
-        .space-leicester-square { grid-column: 7; grid-row: 1; }
-        .space-coventry-street { grid-column: 8; grid-row: 1; }
-        .space-water-works { grid-column: 9; grid-row: 1; }
-        .space-piccadilly { grid-column: 10; grid-row: 1; }
-        .space-go-to-jail { grid-column: 11; grid-row: 1; }
-
-        /* Right Column */
-        .space-regent-street { grid-column: 11; grid-row: 2; }
-        .space-oxford-street { grid-column: 11; grid-row: 3; }
-        .space-community-chest-right { grid-column: 11; grid-row: 4; }
-        .space-bond-street { grid-column: 11; grid-row: 5; }
-        .space-liverpool-st-station { grid-column: 11; grid-row: 6; }
-        .space-chance-right { grid-column: 11; grid-row: 7; }
-        .space-park-lane { grid-column: 11; grid-row: 8; }
-        .space-super-tax { grid-column: 11; grid-row: 9; }
-        .space-mayfair { grid-column: 11; grid-row: 10; }
-
-        .left-col .content .name, .right-col .content .name,
-        .left-col .content .price, .right-col .content .price,
-        .left-col.space .content > div:not(.color-bar):not(.name):not(.price),
-        .right-col.space .content > div:not(.color-bar):not(.name):not(.price) {
-            font-size: 7.5px;
-            line-height: 1.1;
-        }
-        
-        .left-col .content .name, .right-col .content .name {
-            text-align: center;
-            white-space: normal;
-            width: 22px;
-            margin: 1px 0;
-        }
-
-        .left-col.property .content .name, .left-col.space .content .station-icon + div, .left-col.space .content .utility-icon + div, .left-col.space .content .tax-icon + div, .left-col.space .content .chance-icon + div, .left-col.space .content .community-chest-icon + div {
-            transform: rotate(90deg);
-        }
-        .right-col.property .content .name, .right-col.space .content .station-icon + div, .right-col.space .content .utility-icon + div, .right-col.space .content .tax-icon + div, .right-col.space .content .chance-icon + div, .right-col.space .content .community-chest-icon + div {
-            transform: rotate(-90deg);
-        }
-         .left-col .content .price, .right-col .content .price {
-            transform: none !important;
-         }
-
-        .top-row.property .content .name, .top-row.space .content .station-icon + div, .top-row.space .content .utility-icon + div {
-             transform: rotate(180deg);
-        }
-         .top-row .content .price {
-            transform: rotate(180deg);
-         }
-
+        /* Text rotation styles remain the same */
+        .left-col .content .name, .right-col .content .name, .left-col .content .price, .right-col .content .price, .left-col.space .content > div:not(.color-bar):not(.name):not(.price), .right-col.space .content > div:not(.color-bar):not(.name):not(.price) { font-size: 7.5px; line-height: 1.1; }
+        .left-col .content .name, .right-col .content .name { text-align: center; white-space: normal; width: 22px; margin: 1px 0; }
+        .left-col.property .content .name, .left-col.space .content .station-icon + div, .left-col.space .content .utility-icon + div, .left-col.space .content .tax-icon + div, .left-col.space .content .chance-icon + div, .left-col.space .content .community-chest-icon + div { transform: rotate(90deg); }
+        .right-col.property .content .name, .right-col.space .content .station-icon + div, .right-col.space .content .utility-icon + div, .right-col.space .content .tax-icon + div, .right-col.space .content .chance-icon + div, .right-col.space .content .community-chest-icon + div { transform: rotate(-90deg); }
+        .left-col .content .price, .right-col .content .price { transform: none !important; }
+        .top-row.property .content .name, .top-row.space .content .station-icon + div, .top-row.space .content .utility-icon + div { transform: rotate(180deg); }
+        .top-row .content .price { transform: rotate(180deg); }
         .space-jail .just { position: absolute; top: 15px; left: 5px; transform: rotate(45deg); font-size: 10px;}
         .space-jail .visiting { position: absolute; bottom: 15px; right: 5px; transform: rotate(45deg); font-size: 10px;}
         .space-go .arrow { font-size: 30px; color: #d60000; line-height: 1; }
 
-        .center-area {
-            grid-column: 2 / span 9;
-            grid-row: 2 / span 9;
-            background-color: #ddebe0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
-            border: 2px solid black;
-            padding: 20px;
-        }
-        .game-title {
-            font-size: 48px;
-            font-weight: bold;
-            color: #d60000;
-            text-shadow: 2px 2px #000;
-            letter-spacing: 2px;
-        }
-        .card-pile-placeholder {
-            width: 150px;
-            height: 100px;
-            border: 2px dashed #555;
+        /* Center Area styles remain the same */
+        .center-area { grid-column: 2 / span 9; grid-row: 2 / span 9; background-color: #ddebe0; display: flex; flex-direction: column; align-items: center; justify-content: space-around; border: 2px solid black; padding: 20px; }
+        .game-title { font-size: 48px; font-weight: bold; color: #d60000; text-shadow: 2px 2px #000; letter-spacing: 2px; }
+        .card-pile-placeholder { width: 150px; height: 100px; border: 2px dashed #555; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 8px; background-color: #f0f0f0; font-weight: 500; }
+        .card-piles-container { display: flex; justify-content: space-around; width: 100%; }
+
+        /* Color definitions remain the same */
+        .brown { background-color: #955436; } .light-blue { background-color: #aae0fa; } .pink { background-color: #d93a96; } .orange { background-color: #f7941d; } .red { background-color: #ed1b24; } .yellow { background-color: #fff200; } .green { background-color: #1fb25a; } .dark-blue { background-color: #0072bb; }
+
+        /* Icon styles remain the same */
+        .station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon { font-size: 20px; margin-bottom: 3px; }
+        .station-icon::before { content: "🚂"; } .utility-icon.electric::before { content: "💡"; } .utility-icon.water::before { content: "💧"; } .tax-icon.income::before { content: "💸"; } .tax-icon.super::before { content: "💎"; } .chance-icon::before { content: "❓"; } .community-chest-icon::before { content: "🎁"; }
+
+        /* Game Controls & Player Info Area styles remain the same */
+        .game-controls { background-color: #f0e6d2; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 100%; max-width: 800px; margin-top: 20px; text-align: center; }
+        .player-info-container { display: flex; justify-content: space-around; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .player-info { background-color: #fff; border: 2px solid #ccc; padding: 10px 15px; border-radius: 8px; min-width: 160px; text-align: left; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
+        .player-info.active-player { border-color: #d60000; box-shadow: 0 0 10px #d60000; }
+        .player-info h3 { margin-top: 0; font-size: 1.1em; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; }
+        .dice-area { margin: 15px 0; }
+        .dice-area span { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; border: 1px solid #333; background-color: white; font-size: 20px; font-weight: bold; margin: 0 5px; border-radius: 5px; }
+        #rollDiceButton, .modal-button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin: 5px;}
+        #rollDiceButton:hover, .modal-button:hover { background-color: #45a049; }
+        #rollDiceButton:disabled { background-color: #ccc; cursor: not-allowed; }
+        .modal-button.secondary { background-color: #f44336; } /* Red for "Pass" or "Cancel" */
+        .modal-button.secondary:hover { background-color: #d32f2f; }
+        .message-log { margin-top: 15px; padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; min-height: 50px; text-align: left; font-size: 0.9em; max-height: 100px; overflow-y: auto;}
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            border-radius: 8px;
-            background-color: #f0f0f0;
-            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .card-piles-container {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
         }
-
-        .brown { background-color: #955436; }
-        .light-blue { background-color: #aae0fa; }
-        .pink { background-color: #d93a96; }
-        .orange { background-color: #f7941d; }
-        .red { background-color: #ed1b24; }
-        .yellow { background-color: #fff200; }
-        .green { background-color: #1fb25a; }
-        .dark-blue { background-color: #0072bb; }
-
-        .station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon {
-            font-size: 20px;
-            margin-bottom: 3px;
-        }
-        .station-icon::before { content: "🚂"; }
-        .utility-icon.electric::before { content: "💡"; }
-        .utility-icon.water::before { content: "💧"; }
-        .tax-icon.income::before { content: "💸"; }
-        .tax-icon.super::before { content: "💎"; }
-        .chance-icon::before { content: "❓"; }
-        .community-chest-icon::before { content: "🎁"; }
-
-        /* Game Controls & Player Info Area */
-        .game-controls {
-            background-color: #f0e6d2; /* Creamy background */
-            padding: 20px;
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            width: 100%;
-            max-width: 800px; /* Match board width */
-            margin-top: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 450px;
             text-align: center;
+            transform: translateY(-50px) scale(0.95); /* Initial state for animation */
+            transition: transform 0.3s ease-out;
+            border-top: 10px solid #d60000; /* Monopoly Red accent */
         }
-        .player-info-container {
-            display: flex;
-            justify-content: space-around;
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0) scale(1); /* Final state for animation */
+        }
+        .modal-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
             margin-bottom: 15px;
+        }
+        .modal-message {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
             flex-wrap: wrap;
         }
-        .player-info {
-            background-color: #fff;
-            border: 2px solid #ccc;
-            padding: 10px 15px;
-            border-radius: 8px;
-            min-width: 150px;
-            text-align: left;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-        }
-        .player-info.active-player {
-            border-color: #d60000; /* Highlight active player */
-            box-shadow: 0 0 10px #d60000;
-        }
-        .player-info h3 {
-            margin-top: 0;
-            font-size: 1.1em;
-            font-weight: 600;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            margin-bottom: 8px;
-        }
-        .dice-area {
-            margin: 15px 0;
-        }
-        .dice-area span {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            border: 1px solid #333;
-            background-color: white;
-            font-size: 20px;
-            font-weight: bold;
-            margin: 0 5px;
-            border-radius: 5px;
-        }
-        #rollDiceButton {
-            background-color: #4CAF50; /* Green */
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        #rollDiceButton:hover {
-            background-color: #45a049;
-        }
-        #rollDiceButton:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .message-log {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-height: 50px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="board">
-            <div id="space-30" class="space corner space-go-to-jail">
-                <div class="content">
-                    <div>GO TO</div>
-                    <div style="font-size: 30px;">🚓</div>
-                    <div>JAIL</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-
-            <div id="space-21" class="space property top-row space-strand">
-                <div class="content">
-                    <div class="color-bar red"></div>
-                    <div class="name">STRAND</div>
-                    <div class="price">£220</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-22" class="space top-row space-chance-top">
-                <div class="content">
-                    <div class="chance-icon"></div>
-                    <div>CHANCE</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-23" class="space property top-row space-fleet-street">
-                <div class="content">
-                    <div class="color-bar red"></div>
-                    <div class="name">FLEET STREET</div>
-                    <div class="price">£220</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-24" class="space property top-row space-trafalgar-square">
-                <div class="content">
-                    <div class="color-bar red"></div>
-                    <div class="name">TRAFALGAR SQUARE</div>
-                    <div class="price">£240</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-25" class="space top-row space-fenchurch-st-station">
-                <div class="content">
-                    <div class="station-icon"></div>
-                    <div>FENCHURCH ST.<br>STATION</div>
-                    <div class="price">£200</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-26" class="space property top-row space-leicester-square">
-                <div class="content">
-                    <div class="color-bar yellow"></div>
-                    <div class="name">LEICESTER SQUARE</div>
-                    <div class="price">£260</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-27" class="space property top-row space-coventry-street">
-                <div class="content">
-                    <div class="color-bar yellow"></div>
-                    <div class="name">COVENTRY STREET</div>
-                    <div class="price">£260</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-28" class="space top-row space-water-works">
-                <div class="content">
-                    <div class="utility-icon water"></div>
-                    <div>WATER WORKS</div>
-                    <div class="price">£150</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-29" class="space property top-row space-piccadilly">
-                <div class="content">
-                    <div class="color-bar yellow"></div>
-                    <div class="name">PICCADILLY</div>
-                    <div class="price">£280</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-
-            <div id="space-20" class="space corner space-free-parking">
-                <div class="content">
-                    <div>FREE</div>
-                    <div style="font-size: 30px;">🅿️</div>
-                    <div>PARKING</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-
-            <div id="space-19" class="space property left-col space-vine-street">
-                <div class="content">
-                    <div class="color-bar orange"></div>
-                    <div class="name">VINE STREET</div>
-                    <div class="price">£200</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-18" class="space property left-col space-marlborough-street">
-                <div class="content">
-                    <div class="color-bar orange"></div>
-                    <div class="name">MARLBOROUGH STREET</div>
-                    <div class="price">£180</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-17" class="space left-col space-community-chest-left">
-                <div class="content">
-                    <div class="community-chest-icon"></div>
-                    <div>COMMUNITY CHEST</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-16" class="space property left-col space-bow-street">
-                <div class="content">
-                    <div class="color-bar orange"></div>
-                    <div class="name">BOW STREET</div>
-                    <div class="price">£180</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-15" class="space left-col space-marylebone-station">
-                <div class="content">
-                    <div class="station-icon"></div>
-                    <div>MARYLEBONE STATION</div>
-                    <div class="price">£200</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-14" class="space property left-col space-northumberland-avenue">
-                <div class="content">
-                    <div class="color-bar pink"></div>
-                    <div class="name">NORTHUMBERLAND<br>AVENUE</div>
-                    <div class="price">£160</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-13" class="space property left-col space-whitehall">
-                <div class="content">
-                    <div class="color-bar pink"></div>
-                    <div class="name">WHITEHALL</div>
-                    <div class="price">£140</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-12" class="space left-col space-electric-company">
-                <div class="content">
-                    <div class="utility-icon electric"></div>
-                    <div>ELECTRIC COMPANY</div>
-                    <div class="price">£150</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-11" class="space property left-col space-pall-mall">
-                <div class="content">
-                    <div class="color-bar pink"></div>
-                    <div class="name">PALL MALL</div>
-                    <div class="price">£140</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-
-            <div id="space-10" class="space corner space-jail">
-                <div class="content">
-                    <div class="just">JUST</div>
-                    <div style="font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;">👮</div>
-                    <div class="visiting">VISITING</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-
-            <div id="space-9" class="space property space-pentonville-road">
-                <div class="content">
-                    <div class="color-bar light-blue"></div>
-                    <div class="name">PENTONVILLE ROAD</div>
-                    <div class="price">£120</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-8" class="space property space-euston-road">
-                <div class="content">
-                    <div class="color-bar light-blue"></div>
-                    <div class="name">EUSTON ROAD</div>
-                    <div class="price">£100</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-7" class="space space-chance-bottom">
-                <div class="content">
-                    <div class="chance-icon"></div>
-                    <div>CHANCE</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-6" class="space property space-the-angel-islington">
-                <div class="content">
-                    <div class="color-bar light-blue"></div>
-                    <div class="name">THE ANGEL,<br>ISLINGTON</div>
-                    <div class="price">£100</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-5" class="space space-kings-cross">
-                <div class="content">
-                    <div class="station-icon"></div>
-                    <div>KING'S CROSS STATION</div>
-                    <div class="price">£200</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-4" class="space space-income-tax">
-                <div class="content">
-                    <div class="tax-icon income"></div>
-                    <div>INCOME TAX</div>
-                    <div>PAY £200</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-3" class="space property space-whitechapel-road">
-                <div class="content">
-                    <div class="color-bar brown"></div>
-                    <div class="name">WHITECHAPEL ROAD</div>
-                    <div class="price">£60</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-2" class="space space-community-chest-bottom">
-                <div class="content">
-                    <div class="community-chest-icon"></div>
-                    <div>COMMUNITY CHEST</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
             <div id="space-1" class="space property space-old-kent-road">
                 <div class="content">
                     <div class="color-bar brown"></div>
@@ -588,8 +239,8 @@
                     <div class="price">£60</div>
                 </div>
                 <div class="token-container"></div>
+                <div class="owner-marker-container"><div class="owner-marker"></div></div>
             </div>
-
             <div id="space-0" class="space corner space-go">
                 <div class="content">
                     <div>COLLECT £200 SALARY AS YOU PASS</div>
@@ -597,78 +248,45 @@
                     <div>GO</div>
                 </div>
                 <div class="token-container"></div>
-            </div>
-
-            <div id="space-39" class="space property right-col space-mayfair">
-                <div class="content">
-                    <div class="color-bar dark-blue"></div>
-                    <div class="name">MAYFAIR</div>
-                    <div class="price">£400</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-38" class="space right-col space-super-tax">
-                <div class="content">
-                    <div class="tax-icon super"></div>
-                    <div>SUPER TAX</div>
-                    <div>PAY £100</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-37" class="space property right-col space-park-lane">
-                <div class="content">
-                    <div class="color-bar dark-blue"></div>
-                    <div class="name">PARK LANE</div>
-                    <div class="price">£350</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-36" class="space right-col space-chance-right">
-                <div class="content">
-                    <div class="chance-icon"></div>
-                    <div>CHANCE</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-35" class="space right-col space-liverpool-st-station">
-                <div class="content">
-                    <div class="station-icon"></div>
-                    <div>LIVERPOOL ST.<br>STATION</div>
-                    <div class="price">£200</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-34" class="space property right-col space-bond-street">
-                <div class="content">
-                    <div class="color-bar green"></div>
-                    <div class="name">BOND STREET</div>
-                    <div class="price">£320</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-33" class="space right-col space-community-chest-right">
-                <div class="content">
-                    <div class="community-chest-icon"></div>
-                    <div>COMMUNITY CHEST</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-32" class="space property right-col space-oxford-street">
-                <div class="content">
-                    <div class="color-bar green"></div>
-                    <div class="name">OXFORD STREET</div>
-                    <div class="price">£300</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
-            <div id="space-31" class="space property right-col space-regent-street">
-                <div class="content">
-                    <div class="color-bar green"></div>
-                    <div class="name">REGENT STREET</div>
-                    <div class="price">£300</div>
-                </div>
-                <div class="token-container"></div>
-            </div>
+                <div class="owner-marker-container"></div> </div>
+            <div id="space-2" class="space space-community-chest-bottom"> <div class="content"><div class="community-chest-icon"></div><div>COMMUNITY CHEST</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-3" class="space property space-whitechapel-road"> <div class="content"><div class="color-bar brown"></div><div class="name">WHITECHAPEL ROAD</div><div class="price">£60</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-4" class="space space-income-tax"> <div class="content"><div class="tax-icon income"></div><div>INCOME TAX</div><div>PAY £200</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-5" class="space space-kings-cross"> <div class="content"><div class="station-icon"></div><div>KING'S CROSS STATION</div><div class="price">£200</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-6" class="space property space-the-angel-islington"> <div class="content"><div class="color-bar light-blue"></div><div class="name">THE ANGEL,<br>ISLINGTON</div><div class="price">£100</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-7" class="space space-chance-bottom"> <div class="content"><div class="chance-icon"></div><div>CHANCE</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-8" class="space property space-euston-road"> <div class="content"><div class="color-bar light-blue"></div><div class="name">EUSTON ROAD</div><div class="price">£100</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-9" class="space property space-pentonville-road"> <div class="content"><div class="color-bar light-blue"></div><div class="name">PENTONVILLE ROAD</div><div class="price">£120</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-10" class="space corner space-jail"> <div class="content"><div class="just">JUST</div><div style="font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;">👮</div><div class="visiting">VISITING</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-11" class="space property left-col space-pall-mall"> <div class="content"><div class="color-bar pink"></div><div class="name">PALL MALL</div><div class="price">£140</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-12" class="space left-col space-electric-company"> <div class="content"><div class="utility-icon electric"></div><div>ELECTRIC COMPANY</div><div class="price">£150</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-13" class="space property left-col space-whitehall"> <div class="content"><div class="color-bar pink"></div><div class="name">WHITEHALL</div><div class="price">£140</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-14" class="space property left-col space-northumberland-avenue"> <div class="content"><div class="color-bar pink"></div><div class="name">NORTHUMBERLAND<br>AVENUE</div><div class="price">£160</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-15" class="space left-col space-marylebone-station"> <div class="content"><div class="station-icon"></div><div>MARYLEBONE STATION</div><div class="price">£200</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-16" class="space property left-col space-bow-street"> <div class="content"><div class="color-bar orange"></div><div class="name">BOW STREET</div><div class="price">£180</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-17" class="space left-col space-community-chest-left"> <div class="content"><div class="community-chest-icon"></div><div>COMMUNITY CHEST</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-18" class="space property left-col space-marlborough-street"> <div class="content"><div class="color-bar orange"></div><div class="name">MARLBOROUGH STREET</div><div class="price">£180</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-19" class="space property left-col space-vine-street"> <div class="content"><div class="color-bar orange"></div><div class="name">VINE STREET</div><div class="price">£200</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-20" class="space corner space-free-parking"> <div class="content"><div>FREE</div><div style="font-size: 30px;">🅿️</div><div>PARKING</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-21" class="space property top-row space-strand"> <div class="content"><div class="color-bar red"></div><div class="name">STRAND</div><div class="price">£220</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-22" class="space top-row space-chance-top"> <div class="content"><div class="chance-icon"></div><div>CHANCE</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-23" class="space property top-row space-fleet-street"> <div class="content"><div class="color-bar red"></div><div class="name">FLEET STREET</div><div class="price">£220</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-24" class="space property top-row space-trafalgar-square"> <div class="content"><div class="color-bar red"></div><div class="name">TRAFALGAR SQUARE</div><div class="price">£240</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-25" class="space top-row space-fenchurch-st-station"> <div class="content"><div class="station-icon"></div><div>FENCHURCH ST.<br>STATION</div><div class="price">£200</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-26" class="space property top-row space-leicester-square"> <div class="content"><div class="color-bar yellow"></div><div class="name">LEICESTER SQUARE</div><div class="price">£260</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-27" class="space property top-row space-coventry-street"> <div class="content"><div class="color-bar yellow"></div><div class="name">COVENTRY STREET</div><div class="price">£260</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-28" class="space top-row space-water-works"> <div class="content"><div class="utility-icon water"></div><div>WATER WORKS</div><div class="price">£150</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-29" class="space property top-row space-piccadilly"> <div class="content"><div class="color-bar yellow"></div><div class="name">PICCADILLY</div><div class="price">£280</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-30" class="space corner space-go-to-jail"> <div class="content"><div>GO TO</div><div style="font-size: 30px;">🚓</div><div>JAIL</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-31" class="space property right-col space-regent-street"> <div class="content"><div class="color-bar green"></div><div class="name">REGENT STREET</div><div class="price">£300</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-32" class="space property right-col space-oxford-street"> <div class="content"><div class="color-bar green"></div><div class="name">OXFORD STREET</div><div class="price">£300</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-33" class="space right-col space-community-chest-right"> <div class="content"><div class="community-chest-icon"></div><div>COMMUNITY CHEST</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-34" class="space property right-col space-bond-street"> <div class="content"><div class="color-bar green"></div><div class="name">BOND STREET</div><div class="price">£320</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-35" class="space right-col space-liverpool-st-station"> <div class="content"><div class="station-icon"></div><div>LIVERPOOL ST.<br>STATION</div><div class="price">£200</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-36" class="space right-col space-chance-right"> <div class="content"><div class="chance-icon"></div><div>CHANCE</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-37" class="space property right-col space-park-lane"> <div class="content"><div class="color-bar dark-blue"></div><div class="name">PARK LANE</div><div class="price">£350</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
+            <div id="space-38" class="space right-col space-super-tax"> <div class="content"><div class="tax-icon super"></div><div>SUPER TAX</div><div>PAY £100</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-39" class="space property right-col space-mayfair"> <div class="content"><div class="color-bar dark-blue"></div><div class="name">MAYFAIR</div><div class="price">£400</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
 
             <div class="center-area">
                 <div class="game-title">MONOPOLY</div>
@@ -680,8 +298,7 @@
         </div>
 
         <div class="game-controls">
-            <div id="playerInfoContainer" class="player-info-container">
-                </div>
+            <div id="playerInfoContainer" class="player-info-container"></div>
             <div class="current-player-turn mb-4">
                 Current Turn: <strong id="currentPlayerName">Player 1</strong>
             </div>
@@ -694,22 +311,31 @@
         </div>
     </div>
 
+    <div id="eventModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modalTitle" class="modal-title">Event!</h2>
+            <p id="modalMessage" class="modal-message">Something happened!</p>
+            <div id="modalButtons" class="modal-buttons">
+                </div>
+        </div>
+    </div>
+
     <script>
         // --- Game Constants ---
         const TOTAL_SPACES = 40;
         const PASS_GO_SALARY = 200;
         const STARTING_MONEY = 1500;
         const MAX_PLAYERS = 6;
-        // Player visual representations (emojis) and UI colors
-        const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕']; // Horse, Leopard, Elephant, Tiger, Monkey, Dog
-        const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E']; // Red, Blue, Dark Green, Orange, Purple, Brown (for UI elements like name headers)
-
+        const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕'];
+        const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E'];
+        const JAIL_POSITION = 10; // Index of Jail space
 
         // --- Game State Variables ---
         let players = [];
         let currentPlayerIndex = 0;
         let dice = [0, 0];
         let gameInitialized = false;
+        let boardData = []; // Will be populated by initializeBoardData()
 
         // --- DOM Elements ---
         const rollDiceButton = document.getElementById('rollDiceButton');
@@ -719,45 +345,114 @@
         const currentPlayerNameDisplay = document.getElementById('currentPlayerName');
         const playerInfoContainer = document.getElementById('playerInfoContainer');
         const messageLog = document.getElementById('messageLog');
+        const eventModal = document.getElementById('eventModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalButtons = document.getElementById('modalButtons');
 
-        // Board space IDs (same as before)
-        const boardSpaceIds = [
-            'space-0', 'space-1', 'space-2', 'space-3', 'space-4', 'space-5', 'space-6', 'space-7', 'space-8', 'space-9',
-            'space-10', 'space-11', 'space-12', 'space-13', 'space-14', 'space-15', 'space-16', 'space-17', 'space-18', 'space-19',
-            'space-20', 'space-21', 'space-22', 'space-23', 'space-24', 'space-25', 'space-26', 'space-27', 'space-28', 'space-29',
-            'space-30', 'space-31', 'space-32', 'space-33', 'space-34', 'space-35', 'space-36', 'space-37', 'space-38', 'space-39'
-        ];
+        // Board space IDs (match HTML element IDs)
+        const boardSpaceIds = Array.from({ length: TOTAL_SPACES }, (_, i) => `space-${i}`);
+
+        // --- Board Data Initialization ---
+        function initializeBoardData() {
+            boardData = [
+                { id: 'space-0', name: "GO", type: "go", group: "corner" },
+                { id: 'space-1', name: "Old Kent Road", type: "property", price: 60, rent: [2, 10, 30, 90, 160, 250], group: "brown", ownerId: null, houseCost: 50 },
+                { id: 'space-2', name: "Community Chest", type: "community-chest", group: "event" },
+                { id: 'space-3', name: "Whitechapel Road", type: "property", price: 60, rent: [4, 20, 60, 180, 320, 450], group: "brown", ownerId: null, houseCost: 50 },
+                { id: 'space-4', name: "Income Tax", type: "tax", amount: 200, group: "event" },
+                { id: 'space-5', name: "King's Cross Station", type: "station", price: 200, rent: [25, 50, 100, 200], group: "station", ownerId: null },
+                { id: 'space-6', name: "The Angel, Islington", type: "property", price: 100, rent: [6, 30, 90, 270, 400, 550], group: "light-blue", ownerId: null, houseCost: 50 },
+                { id: 'space-7', name: "Chance", type: "chance", group: "event" },
+                { id: 'space-8', name: "Euston Road", type: "property", price: 100, rent: [6, 30, 90, 270, 400, 550], group: "light-blue", ownerId: null, houseCost: 50 },
+                { id: 'space-9', name: "Pentonville Road", type: "property", price: 120, rent: [8, 40, 100, 300, 450, 600], group: "light-blue", ownerId: null, houseCost: 50 },
+                { id: 'space-10', name: "Jail / Just Visiting", type: "jail", group: "corner" },
+                { id: 'space-11', name: "Pall Mall", type: "property", price: 140, rent: [10, 50, 150, 450, 625, 750], group: "pink", ownerId: null, houseCost: 100 },
+                { id: 'space-12', name: "Electric Company", type: "utility", price: 150, group: "utility", ownerId: null },
+                { id: 'space-13', name: "Whitehall", type: "property", price: 140, rent: [10, 50, 150, 450, 625, 750], group: "pink", ownerId: null, houseCost: 100 },
+                { id: 'space-14', name: "Northumberland Avenue", type: "property", price: 160, rent: [12, 60, 180, 500, 700, 900], group: "pink", ownerId: null, houseCost: 100 },
+                { id: 'space-15', name: "Marylebone Station", type: "station", price: 200, rent: [25, 50, 100, 200], group: "station", ownerId: null },
+                { id: 'space-16', name: "Bow Street", type: "property", price: 180, rent: [14, 70, 200, 550, 750, 950], group: "orange", ownerId: null, houseCost: 100 },
+                { id: 'space-17', name: "Community Chest", type: "community-chest", group: "event" },
+                { id: 'space-18', name: "Marlborough Street", type: "property", price: 180, rent: [14, 70, 200, 550, 750, 950], group: "orange", ownerId: null, houseCost: 100 },
+                { id: 'space-19', name: "Vine Street", type: "property", price: 200, rent: [16, 80, 220, 600, 800, 1000], group: "orange", ownerId: null, houseCost: 100 },
+                { id: 'space-20', name: "Free Parking", type: "free-parking", group: "corner" },
+                { id: 'space-21', name: "Strand", type: "property", price: 220, rent: [18, 90, 250, 700, 875, 1050], group: "red", ownerId: null, houseCost: 150 },
+                { id: 'space-22', name: "Chance", type: "chance", group: "event" },
+                { id: 'space-23', name: "Fleet Street", type: "property", price: 220, rent: [18, 90, 250, 700, 875, 1050], group: "red", ownerId: null, houseCost: 150 },
+                { id: 'space-24', name: "Trafalgar Square", type: "property", price: 240, rent: [20, 100, 300, 750, 925, 1100], group: "red", ownerId: null, houseCost: 150 },
+                { id: 'space-25', name: "Fenchurch St. Station", type: "station", price: 200, rent: [25, 50, 100, 200], group: "station", ownerId: null },
+                { id: 'space-26', name: "Leicester Square", type: "property", price: 260, rent: [22, 110, 330, 800, 975, 1150], group: "yellow", ownerId: null, houseCost: 150 },
+                { id: 'space-27', name: "Coventry Street", type: "property", price: 260, rent: [22, 110, 330, 800, 975, 1150], group: "yellow", ownerId: null, houseCost: 150 },
+                { id: 'space-28', name: "Water Works", type: "utility", price: 150, group: "utility", ownerId: null },
+                { id: 'space-29', name: "Piccadilly", type: "property", price: 280, rent: [24, 120, 360, 850, 1025, 1200], group: "yellow", ownerId: null, houseCost: 150 },
+                { id: 'space-30', name: "Go To Jail", type: "go-to-jail", group: "corner" },
+                { id: 'space-31', name: "Regent Street", type: "property", price: 300, rent: [26, 130, 390, 900, 1100, 1275], group: "green", ownerId: null, houseCost: 200 },
+                { id: 'space-32', name: "Oxford Street", type: "property", price: 300, rent: [26, 130, 390, 900, 1100, 1275], group: "green", ownerId: null, houseCost: 200 },
+                { id: 'space-33', name: "Community Chest", type: "community-chest", group: "event" },
+                { id: 'space-34', name: "Bond Street", type: "property", price: 320, rent: [28, 150, 450, 1000, 1200, 1400], group: "green", ownerId: null, houseCost: 200 },
+                { id: 'space-35', name: "Liverpool St. Station", type: "station", price: 200, rent: [25, 50, 100, 200], group: "station", ownerId: null },
+                { id: 'space-36', name: "Chance", type: "chance", group: "event" },
+                { id: 'space-37', name: "Park Lane", type: "property", price: 350, rent: [35, 175, 500, 1100, 1300, 1500], group: "dark-blue", ownerId: null, houseCost: 200 },
+                { id: 'space-38', name: "Super Tax", type: "tax", amount: 100, group: "event" },
+                { id: 'space-39', name: "Mayfair", type: "property", price: 400, rent: [50, 200, 600, 1400, 1700, 2000], group: "dark-blue", ownerId: null, houseCost: 200 }
+            ];
+             // Ensure all spaces have an ownerId, defaulting to null if not ownable
+            boardData.forEach(space => {
+                if (!('ownerId' in space) && (space.type === 'property' || space.type === 'station' || space.type === 'utility')) {
+                    space.ownerId = null;
+                }
+            });
+        }
 
 
-        // --- Game Logic Functions ---
+        // --- Modal Functions ---
+        function showModal(title, message, buttonsConfig = [{ text: "OK", action: hideModal }]) {
+            modalTitle.textContent = title;
+            modalMessage.innerHTML = message; // Use innerHTML to allow basic formatting like <br>
+            modalButtons.innerHTML = ''; // Clear existing buttons
 
-        /**
-         * Initializes the game with a specified number of players.
-         * @param {number} numPlayers - Number of players (2-6).
-         */
+            buttonsConfig.forEach(btnConfig => {
+                const button = document.createElement('button');
+                button.textContent = btnConfig.text;
+                button.classList.add('modal-button');
+                if (btnConfig.class) button.classList.add(btnConfig.class);
+                button.onclick = () => {
+                    hideModal(); // Always hide modal after a button click
+                    if (btnConfig.action) btnConfig.action();
+                };
+                modalButtons.appendChild(button);
+            });
+            eventModal.classList.add('visible');
+        }
+
+        function hideModal() {
+            eventModal.classList.remove('visible');
+        }
+
+        // --- Game Logic Functions (Initialization, Player Token, Info Display are similar to before) ---
         function initializeGame(numPlayers = 2) {
-            if (gameInitialized) {
-                logMessage("Game already initialized.");
-                return;
-            }
+            if (gameInitialized) { logMessage("Game already initialized."); return; }
+            initializeBoardData(); // IMPORTANT: Initialize board data
             players = [];
             currentPlayerIndex = 0;
-
             playerInfoContainer.innerHTML = '';
             document.querySelectorAll('.player-token').forEach(token => token.remove());
+            document.querySelectorAll('.owner-marker').forEach(marker => marker.style.backgroundColor = 'transparent');
+
 
             for (let i = 0; i < numPlayers; i++) {
                 const player = {
                     id: i,
                     name: `Player ${i + 1}`,
                     tokenRepresentation: PLAYER_REPRESENTATIONS[i % PLAYER_REPRESENTATIONS.length],
-                    uiColor: PLAYER_UI_COLORS[i % PLAYER_UI_COLORS.length], // Color for UI elements
+                    uiColor: PLAYER_UI_COLORS[i % PLAYER_UI_COLORS.length],
                     money: STARTING_MONEY,
                     currentPosition: 0,
-                    properties: [],
+                    propertiesOwned: [], // Store IDs of owned properties
                     inJail: false,
                     jailTurns: 0,
-                    getOutOfJailFreeCards: 0,
+                    getOutOfJailFreeCards: 0, // Community Chest or Chance
                     tokenElement: null,
                     infoElement: null
                 };
@@ -772,24 +467,15 @@
             rollDiceButton.disabled = false;
         }
 
-        /**
-         * Creates a visual token (emoji) for a player and adds it to the board.
-         * @param {object} player - The player object.
-         */
         function createPlayerToken(player) {
             const token = document.createElement('div');
             token.classList.add('player-token');
-            token.innerHTML = player.tokenRepresentation; // Set emoji as content
-            token.setAttribute('title', player.name); // Tooltip for player name
+            token.innerHTML = player.tokenRepresentation;
+            token.setAttribute('title', player.name);
             player.tokenElement = token;
             placeTokenOnBoard(player);
         }
 
-        /**
-         * Creates the UI element to display player's information.
-         * Player name header will use player.uiColor.
-         * @param {object} player - The player object.
-         */
         function createPlayerInfoDisplay(player) {
             const infoDiv = document.createElement('div');
             infoDiv.classList.add('player-info');
@@ -798,57 +484,32 @@
                 <h3 style="color: ${player.uiColor};">${player.name} (${player.tokenRepresentation})</h3>
                 <p>Money: <span class="money-display">£${player.money}</span></p>
                 <p>Position: <span class="position-display">GO</span></p>
+                <p>Properties: <span class="properties-display">0</span></p>
             `;
             player.infoElement = infoDiv;
             playerInfoContainer.appendChild(infoDiv);
         }
 
-        /**
-         * Updates the displayed information for a single player.
-         * @param {object} player - The player object.
-         */
         function updatePlayerInfoDisplay(player) {
             if (player.infoElement) {
                 player.infoElement.querySelector('.money-display').textContent = `£${player.money}`;
-                const spaceElement = document.getElementById(boardSpaceIds[player.currentPosition]);
-                let spaceName = `Space ${player.currentPosition}`; // Default
-                if (spaceElement) {
-                    // Try to get a descriptive name from the space's content
-                    const nameElement = spaceElement.querySelector('.content .name');
-                    if (nameElement) {
-                        spaceName = nameElement.textContent.trim();
-                    } else {
-                        // Fallback for non-property spaces like GO, Jail, Chance etc.
-                        const mainTextElement = spaceElement.querySelector('.content > div:first-child');
-                        if (mainTextElement) {
-                           spaceName = mainTextElement.textContent.trim().split('\n')[0];
-                        }
-                    }
-                }
-                player.infoElement.querySelector('.position-display').textContent = spaceName.split('\n')[0];
+                const spaceData = boardData[player.currentPosition];
+                player.infoElement.querySelector('.position-display').textContent = spaceData.name.split('<br>')[0];
+                player.infoElement.querySelector('.properties-display').textContent = player.propertiesOwned.length;
             }
-            // Highlight active player
             document.querySelectorAll('.player-info').forEach(el => el.classList.remove('active-player'));
             if (players[currentPlayerIndex] && players[currentPlayerIndex].infoElement) {
                 players[currentPlayerIndex].infoElement.classList.add('active-player');
             }
         }
 
-        /**
-         * Updates information for all players.
-         */
         function updateAllPlayerInfoDisplays() {
             players.forEach(p => updatePlayerInfoDisplay(p));
         }
 
-
-        /**
-         * Places or moves a player's token to their currentPosition on the board.
-         * @param {object} player - The player object.
-         */
         function placeTokenOnBoard(player) {
-            const currentSpaceId = boardSpaceIds[player.currentPosition];
-            const spaceElement = document.getElementById(currentSpaceId);
+            const currentSpaceHtmlId = boardData[player.currentPosition].id;
+            const spaceElement = document.getElementById(currentSpaceHtmlId);
             if (spaceElement) {
                 const tokenContainer = spaceElement.querySelector('.token-container');
                 if (tokenContainer) {
@@ -856,18 +517,26 @@
                         player.tokenElement.parentNode.removeChild(player.tokenElement);
                     }
                     tokenContainer.appendChild(player.tokenElement);
-                } else {
-                    console.error(`Token container not found for space ID: ${currentSpaceId}`);
                 }
-            } else {
-                console.error(`Space element not found for ID: ${currentSpaceId}`);
+            }
+        }
+        
+        function updateOwnerMarker(spaceIndex) {
+            const spaceData = boardData[spaceIndex];
+            const spaceElement = document.getElementById(spaceData.id);
+            if (spaceElement && (spaceData.type === 'property' || spaceData.type === 'station' || spaceData.type === 'utility')) {
+                const ownerMarkerElement = spaceElement.querySelector('.owner-marker');
+                if (ownerMarkerElement) {
+                    if (spaceData.ownerId !== null && players[spaceData.ownerId]) {
+                        ownerMarkerElement.style.backgroundColor = players[spaceData.ownerId].uiColor;
+                    } else {
+                        ownerMarkerElement.style.backgroundColor = 'transparent'; // Or some default for unowned
+                    }
+                }
             }
         }
 
-        /**
-         * Simulates rolling two dice.
-         * @returns {Array<number>} - Array containing results of two dice [d1, d2].
-         */
+
         function rollDice() {
             dice[0] = Math.floor(Math.random() * 6) + 1;
             dice[1] = Math.floor(Math.random() * 6) + 1;
@@ -877,20 +546,26 @@
             return dice;
         }
 
-        /**
-         * Moves the current player based on the dice roll.
-         */
         function handlePlayerTurn() {
-            if (!gameInitialized) {
-                logMessage("Please initialize the game first.");
-                return;
-            }
+            if (!gameInitialized) { logMessage("Please initialize the game first."); return; }
             rollDiceButton.disabled = true;
 
             const currentPlayer = players[currentPlayerIndex];
+            if (currentPlayer.inJail) {
+                // Handle jail turn (simplified for now: just try to roll doubles or pay)
+                // For now, we'll just skip the turn and allow manual "get out of jail" later
+                logMessage(`${currentPlayer.name} is in Jail. Jail logic to be implemented.`);
+                // For now, just end turn. Proper jail logic is complex.
+                setTimeout(() => {
+                    switchTurn();
+                    rollDiceButton.disabled = false;
+                }, 500);
+                return;
+            }
+
+
             const diceResult = rollDice();
             const steps = diceResult[0] + diceResult[1];
-
             logMessage(`${currentPlayer.name} (${currentPlayer.tokenRepresentation}) rolled ${diceResult[0]} + ${diceResult[1]} = ${steps}.`);
 
             const oldPosition = currentPlayer.currentPosition;
@@ -899,37 +574,169 @@
             if (currentPlayer.currentPosition < oldPosition && oldPosition + steps >= TOTAL_SPACES) {
                 currentPlayer.money += PASS_GO_SALARY;
                 logMessage(`${currentPlayer.name} passed GO and collected £${PASS_GO_SALARY}.`);
+                updatePlayerInfoDisplay(currentPlayer);
             }
 
             placeTokenOnBoard(currentPlayer);
-            updatePlayerInfoDisplay(currentPlayer); // Update money and position display
+            updatePlayerInfoDisplay(currentPlayer);
+            logMessage(`${currentPlayer.name} landed on ${boardData[currentPlayer.currentPosition].name.split('<br>')[0]}.`);
 
-            const spaceElement = document.getElementById(boardSpaceIds[currentPlayer.currentPosition]);
-            let newSpaceName = `Space ${currentPlayer.currentPosition}`;
-            if (spaceElement) {
-                const nameElement = spaceElement.querySelector('.content .name');
-                 if (nameElement) {
-                    newSpaceName = nameElement.textContent.trim();
-                } else {
-                    const mainTextElement = spaceElement.querySelector('.content > div:first-child');
-                    if (mainTextElement) {
-                       newSpaceName = mainTextElement.textContent.trim().split('\n')[0];
-                    }
-                }
-            }
-            logMessage(`${currentPlayer.name} landed on ${newSpaceName.split('\n')[0]}.`);
-
-            // Placeholder for landing actions
-            setTimeout(() => {
-                // Future: Call function like handleLandingOnSpace(currentPlayer);
-                switchTurn();
-                rollDiceButton.disabled = false;
-            }, 1000);
+            // Handle landing on the new space
+            handleLandingOnSpace(currentPlayer);
+            // Note: switchTurn and enabling rollDiceButton will now be handled by the modal/action callbacks
         }
 
-        /**
-         * Switches to the next player's turn.
-         */
+        function handleLandingOnSpace(player) {
+            const space = boardData[player.currentPosition];
+            switch (space.type) {
+                case 'property':
+                case 'station':
+                case 'utility':
+                    handleOwnableSpace(player, space);
+                    break;
+                case 'go-to-jail':
+                    goToJail(player);
+                    break;
+                case 'chance':
+                    showModal("Chance!", "You landed on Chance. <br>Draw a card (effects coming soon!).", [{ text: "OK", action: endTurnActions }]);
+                    break;
+                case 'community-chest':
+                    showModal("Community Chest!", "You landed on Community Chest. <br>Draw a card (effects coming soon!).", [{ text: "OK", action: endTurnActions }]);
+                    break;
+                case 'tax':
+                    payTax(player, space);
+                    break;
+                case 'go': // Already handled by pass GO logic mostly
+                case 'jail': // Just visiting
+                case 'free-parking':
+                    logMessage(`${player.name} is just visiting ${space.name}.`);
+                    endTurnActions(); // No further action, just end turn
+                    break;
+                default:
+                    logMessage(`Landed on ${space.name} - no special action.`);
+                    endTurnActions();
+                    break;
+            }
+        }
+
+        function handleOwnableSpace(player, space) {
+            if (space.ownerId === null) { // Unowned
+                const buyCost = space.price;
+                showModal(
+                    `For Sale: ${space.name}`,
+                    `This property is unowned. Would you like to buy it for £${buyCost}? <br>Your money: £${player.money}`,
+                    [
+                        { text: `Buy (£${buyCost})`, action: () => tryBuyProperty(player, space), class: player.money >= buyCost ? '' : 'bg-gray-400 cursor-not-allowed' }, // Disable if not enough money
+                        { text: "Pass", action: () => { logMessage(`${player.name} decided not to buy ${space.name}.`); endTurnActions(); }, class: 'secondary' }
+                    ]
+                );
+            } else if (space.ownerId !== player.id) { // Owned by someone else
+                const owner = players[space.ownerId];
+                let rentAmount = 0;
+                // Simplified rent calculation for now
+                if (space.type === 'property') rentAmount = space.rent[0]; // Base rent
+                else if (space.type === 'station') {
+                    const stationsOwned = players[space.ownerId].propertiesOwned.filter(pId => boardData.find(s => s.id === pId && s.type === 'station')).length;
+                    rentAmount = space.rent[stationsOwned - 1] || 25;
+                } else if (space.type === 'utility') {
+                    const utilitiesOwned = players[space.ownerId].propertiesOwned.filter(pId => boardData.find(s => s.id === pId && s.type === 'utility')).length;
+                    const lastRoll = dice[0] + dice[1];
+                    rentAmount = utilitiesOwned === 1 ? lastRoll * 4 : lastRoll * 10;
+                }
+
+                if (rentAmount > 0) {
+                     showModal(
+                        "Rent Due!",
+                        `This property is owned by ${owner.name}. You owe £${rentAmount} in rent.`,
+                        [{ text: `Pay £${rentAmount}`, action: () => payRent(player, owner, rentAmount) }]
+                    );
+                } else {
+                     logMessage(`${space.name} is owned by ${owner.name}, but no rent due (e.g. mortgaged - logic to come).`);
+                     endTurnActions();
+                }
+
+            } else { // Owned by the current player
+                logMessage(`${player.name} landed on their own property: ${space.name}.`);
+                endTurnActions();
+            }
+        }
+
+        function tryBuyProperty(player, space) {
+            const cost = space.price;
+            if (player.money >= cost) {
+                player.money -= cost;
+                space.ownerId = player.id;
+                player.propertiesOwned.push(space.id); // Store space ID
+                logMessage(`${player.name} bought ${space.name} for £${cost}.`);
+                updatePlayerInfoDisplay(player);
+                updateOwnerMarker(boardData.indexOf(space));
+            } else {
+                logMessage(`${player.name} does not have enough money to buy ${space.name}.`);
+            }
+            endTurnActions();
+        }
+
+        function payRent(payer, owner, amount) {
+            if (payer.money >= amount) {
+                payer.money -= amount;
+                owner.money += amount;
+                logMessage(`${payer.name} paid £${amount} rent to ${owner.name}.`);
+            } else { // Not enough money to pay full rent - bankruptcy logic to come
+                const amountPaid = payer.money;
+                owner.money += amountPaid;
+                payer.money = 0;
+                logMessage(`${payer.name} could only pay £${amountPaid} of £${amount} rent to ${owner.name}. ${payer.name} is bankrupt! (Bankruptcy logic TBD)`);
+                // Implement bankruptcy: sell houses, mortgage properties, or lose game.
+            }
+            updatePlayerInfoDisplay(payer);
+            updatePlayerInfoDisplay(owner);
+            endTurnActions();
+        }
+        
+        function payTax(player, space) {
+            const taxAmount = space.amount;
+            player.money -= taxAmount;
+            logMessage(`${player.name} paid £${taxAmount} for ${space.name}.`);
+            updatePlayerInfoDisplay(player);
+            showModal(
+                space.name,
+                `You landed on ${space.name}. <br>Pay £${taxAmount}.`,
+                [{ text: "OK", action: endTurnActions }]
+            );
+        }
+
+
+        function goToJail(player) {
+            player.currentPosition = JAIL_POSITION;
+            player.inJail = true;
+            player.jailTurns = 0; // Reset jail turns
+            placeTokenOnBoard(player); // Move token visually
+            updatePlayerInfoDisplay(player);
+            logMessage(`${player.name} was sent to Jail!`);
+            showModal(
+                "🚓 Go To Jail! 🚓",
+                "Oh no! You've been caught and sent directly to Jail. Do not pass GO, do not collect £200.",
+                [{ text: "Bummer!", action: endTurnActions }]
+            );
+        }
+        
+        function endTurnActions() {
+            // This function will be called after modal interactions or simple landings
+            // Check for doubles for another turn (not implemented yet)
+            // For now, just switch turn
+            if (dice[0] === dice[1] && !players[currentPlayerIndex].inJail) {
+                 logMessage(`${players[currentPlayerIndex].name} rolled doubles! Roll again.`);
+                 rollDiceButton.disabled = false; // Allow current player to roll again
+                 // Need to handle 3 doubles = go to jail later
+            } else {
+                setTimeout(() => { // Short delay before switching
+                    switchTurn();
+                    rollDiceButton.disabled = false;
+                }, 300);
+            }
+        }
+
+
         function switchTurn() {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
             updateCurrentPlayerDisplay();
@@ -937,27 +744,15 @@
             updateAllPlayerInfoDisplays();
         }
 
-        /**
-         * Updates the display for whose turn it is.
-         */
         function updateCurrentPlayerDisplay() {
             if (players.length > 0) {
                 currentPlayerNameDisplay.textContent = `${players[currentPlayerIndex].name} (${players[currentPlayerIndex].tokenRepresentation})`;
             }
         }
 
-        /**
-         * Logs a message to the game's message log.
-         * @param {string} message - The message to log.
-         */
         function logMessage(message) {
             const previousMessage = messageLog.innerHTML;
-            messageLog.innerHTML = message + (previousMessage ? '<br>' + previousMessage : '');
-            const maxMessages = 10;
-            const messages = messageLog.innerHTML.split('<br>');
-            if (messages.length > maxMessages) {
-                messageLog.innerHTML = messages.slice(0, maxMessages).join('<br>');
-            }
+            messageLog.innerHTML = message + (previousMessage ? '<br>' + previousMessage.split('<br>').slice(0, 9).join('<br>') : '');
         }
 
         // --- Event Listeners ---
@@ -965,13 +760,12 @@
 
         // --- Game Initialization ---
         window.onload = () => {
+            // Ensure all spaces have the .content and .token-container, and .owner-marker-container
             document.querySelectorAll('.board .space').forEach(spaceEl => {
                 if (!spaceEl.querySelector('.content')) {
                     const contentWrapper = document.createElement('div');
                     contentWrapper.classList.add('content');
-                    while (spaceEl.firstChild) {
-                        contentWrapper.appendChild(spaceEl.firstChild);
-                    }
+                    while (spaceEl.firstChild) { contentWrapper.appendChild(spaceEl.firstChild); }
                     spaceEl.appendChild(contentWrapper);
                 }
                 if (!spaceEl.querySelector('.token-container')) {
@@ -979,10 +773,23 @@
                     tokenContainer.classList.add('token-container');
                     spaceEl.appendChild(tokenContainer);
                 }
+                if (!spaceEl.querySelector('.owner-marker-container')) {
+                    const ownerMarkerContainer = document.createElement('div');
+                    ownerMarkerContainer.classList.add('owner-marker-container');
+                    // Add the actual marker only if it's an ownable type, or just leave container empty
+                    const spaceId = spaceEl.id;
+                    // Temp check - full boardData not avail here yet, so add marker to all for now
+                    // Proper check would be based on boardData[spaceIndex].type
+                    const ownerMarker = document.createElement('div');
+                    ownerMarker.classList.add('owner-marker');
+                    ownerMarkerContainer.appendChild(ownerMarker);
+                    spaceEl.appendChild(ownerMarkerContainer);
+                }
             });
-            initializeGame(2); // Start with 2 players by default
+            initializeGame(2); // Start with 2 players
         };
 
     </script>
 </body>
 </html>
+
