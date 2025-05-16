@@ -72,23 +72,24 @@
             padding: 1px;
         }
         .player-token {
-            width: 22px;  
-            height: 22px; 
-            font-size: 18px; 
+            width: 22px;  /* Adjusted for emoji size */
+            height: 22px; /* Adjusted for emoji size */
+            font-size: 18px; /* Emoji size */
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(0,0,0,0.2); 
-            border-radius: 4px; 
+            border: 1px solid rgba(0,0,0,0.2); /* Lighter border */
+            border-radius: 4px; /* Slightly rounded square */
             box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            line-height: 1; 
+            line-height: 1; /* Ensure emoji is vertically centered */
         }
+
 
         .corner {
             font-weight: bold;
             font-size: 14px;
         }
-        .corner .content { height: 80%; } 
+        .corner .content { height: 80%; } /* More space for corner text */
         .corner .token-container { height: 20%; }
 
 
@@ -694,14 +695,15 @@
     </div>
 
     <script>
-       
+        // --- Game Constants ---
         const TOTAL_SPACES = 40;
         const PASS_GO_SALARY = 200;
         const STARTING_MONEY = 1500;
-        const MAX_PLAYERS = 6; 
+        const MAX_PLAYERS = 6;
+        // Player visual representations (emojis) and UI colors
         const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕']; // Horse, Leopard, Elephant, Tiger, Monkey, Dog
-        const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E']; 
-        
+        const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E']; // Red, Blue, Dark Green, Orange, Purple, Brown (for UI elements like name headers)
+
 
         // --- Game State Variables ---
         let players = [];
@@ -718,6 +720,7 @@
         const playerInfoContainer = document.getElementById('playerInfoContainer');
         const messageLog = document.getElementById('messageLog');
 
+        // Board space IDs (same as before)
         const boardSpaceIds = [
             'space-0', 'space-1', 'space-2', 'space-3', 'space-4', 'space-5', 'space-6', 'space-7', 'space-8', 'space-9',
             'space-10', 'space-11', 'space-12', 'space-13', 'space-14', 'space-15', 'space-16', 'space-17', 'space-18', 'space-19',
@@ -740,18 +743,17 @@
             players = [];
             currentPlayerIndex = 0;
 
-            // Clear previous player info and tokens if any
             playerInfoContainer.innerHTML = '';
             document.querySelectorAll('.player-token').forEach(token => token.remove());
-
 
             for (let i = 0; i < numPlayers; i++) {
                 const player = {
                     id: i,
                     name: `Player ${i + 1}`,
-                    tokenColor: PLAYER_COLORS[i % PLAYER_COLORS.length],
+                    tokenRepresentation: PLAYER_REPRESENTATIONS[i % PLAYER_REPRESENTATIONS.length],
+                    uiColor: PLAYER_UI_COLORS[i % PLAYER_UI_COLORS.length], // Color for UI elements
                     money: STARTING_MONEY,
-                    currentPosition: 0, // Start at GO (index 0)
+                    currentPosition: 0,
                     properties: [],
                     inJail: false,
                     jailTurns: 0,
@@ -771,13 +773,13 @@
         }
 
         /**
-         * Creates a visual token for a player and adds it to the board.
+         * Creates a visual token (emoji) for a player and adds it to the board.
          * @param {object} player - The player object.
          */
         function createPlayerToken(player) {
             const token = document.createElement('div');
             token.classList.add('player-token');
-            token.style.backgroundColor = player.tokenColor;
+            token.innerHTML = player.tokenRepresentation; // Set emoji as content
             token.setAttribute('title', player.name); // Tooltip for player name
             player.tokenElement = token;
             placeTokenOnBoard(player);
@@ -785,6 +787,7 @@
 
         /**
          * Creates the UI element to display player's information.
+         * Player name header will use player.uiColor.
          * @param {object} player - The player object.
          */
         function createPlayerInfoDisplay(player) {
@@ -792,7 +795,7 @@
             infoDiv.classList.add('player-info');
             infoDiv.id = `player-info-${player.id}`;
             infoDiv.innerHTML = `
-                <h3 style="color: ${player.tokenColor};">${player.name}</h3>
+                <h3 style="color: ${player.uiColor};">${player.name} (${player.tokenRepresentation})</h3>
                 <p>Money: <span class="money-display">£${player.money}</span></p>
                 <p>Position: <span class="position-display">GO</span></p>
             `;
@@ -807,8 +810,22 @@
         function updatePlayerInfoDisplay(player) {
             if (player.infoElement) {
                 player.infoElement.querySelector('.money-display').textContent = `£${player.money}`;
-                const spaceName = document.getElementById(boardSpaceIds[player.currentPosition]).querySelector('.name, div:not(.token-container):not(.color-bar)')?.textContent.trim() || `Space ${player.currentPosition}`;
-                player.infoElement.querySelector('.position-display').textContent = spaceName.split('\n')[0]; // Take first line if multi-line
+                const spaceElement = document.getElementById(boardSpaceIds[player.currentPosition]);
+                let spaceName = `Space ${player.currentPosition}`; // Default
+                if (spaceElement) {
+                    // Try to get a descriptive name from the space's content
+                    const nameElement = spaceElement.querySelector('.content .name');
+                    if (nameElement) {
+                        spaceName = nameElement.textContent.trim();
+                    } else {
+                        // Fallback for non-property spaces like GO, Jail, Chance etc.
+                        const mainTextElement = spaceElement.querySelector('.content > div:first-child');
+                        if (mainTextElement) {
+                           spaceName = mainTextElement.textContent.trim().split('\n')[0];
+                        }
+                    }
+                }
+                player.infoElement.querySelector('.position-display').textContent = spaceName.split('\n')[0];
             }
             // Highlight active player
             document.querySelectorAll('.player-info').forEach(el => el.classList.remove('active-player'));
@@ -835,7 +852,6 @@
             if (spaceElement) {
                 const tokenContainer = spaceElement.querySelector('.token-container');
                 if (tokenContainer) {
-                    // Remove token from old position if it exists and has a parent
                     if (player.tokenElement.parentNode) {
                         player.tokenElement.parentNode.removeChild(player.tokenElement);
                     }
@@ -869,35 +885,46 @@
                 logMessage("Please initialize the game first.");
                 return;
             }
-            rollDiceButton.disabled = true; // Disable button during move
+            rollDiceButton.disabled = true;
 
             const currentPlayer = players[currentPlayerIndex];
             const diceResult = rollDice();
             const steps = diceResult[0] + diceResult[1];
 
-            logMessage(`${currentPlayer.name} rolled ${diceResult[0]} + ${diceResult[1]} = ${steps}.`);
+            logMessage(`${currentPlayer.name} (${currentPlayer.tokenRepresentation}) rolled ${diceResult[0]} + ${diceResult[1]} = ${steps}.`);
 
             const oldPosition = currentPlayer.currentPosition;
             currentPlayer.currentPosition = (oldPosition + steps) % TOTAL_SPACES;
 
-            // Check for passing GO
-            if (currentPlayer.currentPosition < oldPosition && oldPosition + steps >= TOTAL_SPACES) { // Corrected GO check
+            if (currentPlayer.currentPosition < oldPosition && oldPosition + steps >= TOTAL_SPACES) {
                 currentPlayer.money += PASS_GO_SALARY;
                 logMessage(`${currentPlayer.name} passed GO and collected £${PASS_GO_SALARY}.`);
             }
 
             placeTokenOnBoard(currentPlayer);
-            updatePlayerInfoDisplay(currentPlayer);
+            updatePlayerInfoDisplay(currentPlayer); // Update money and position display
 
-            const newSpaceName = document.getElementById(boardSpaceIds[currentPlayer.currentPosition]).querySelector('.name, div:not(.token-container):not(.color-bar)')?.textContent.trim() || `Space ${currentPlayer.currentPosition}`;
+            const spaceElement = document.getElementById(boardSpaceIds[currentPlayer.currentPosition]);
+            let newSpaceName = `Space ${currentPlayer.currentPosition}`;
+            if (spaceElement) {
+                const nameElement = spaceElement.querySelector('.content .name');
+                 if (nameElement) {
+                    newSpaceName = nameElement.textContent.trim();
+                } else {
+                    const mainTextElement = spaceElement.querySelector('.content > div:first-child');
+                    if (mainTextElement) {
+                       newSpaceName = mainTextElement.textContent.trim().split('\n')[0];
+                    }
+                }
+            }
             logMessage(`${currentPlayer.name} landed on ${newSpaceName.split('\n')[0]}.`);
 
-            // Placeholder for landing actions (buy property, pay rent, etc.)
-            // For now, just switch turns after a short delay
+            // Placeholder for landing actions
             setTimeout(() => {
+                // Future: Call function like handleLandingOnSpace(currentPlayer);
                 switchTurn();
                 rollDiceButton.disabled = false;
-            }, 1000); // Delay to see move
+            }, 1000);
         }
 
         /**
@@ -906,8 +933,8 @@
         function switchTurn() {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
             updateCurrentPlayerDisplay();
-            logMessage(`${players[currentPlayerIndex].name}'s turn.`);
-            updateAllPlayerInfoDisplays(); // To update active player highlight
+            logMessage(`${players[currentPlayerIndex].name}'s (${players[currentPlayerIndex].tokenRepresentation}) turn.`);
+            updateAllPlayerInfoDisplays();
         }
 
         /**
@@ -915,7 +942,7 @@
          */
         function updateCurrentPlayerDisplay() {
             if (players.length > 0) {
-                currentPlayerNameDisplay.textContent = players[currentPlayerIndex].name;
+                currentPlayerNameDisplay.textContent = `${players[currentPlayerIndex].name} (${players[currentPlayerIndex].tokenRepresentation})`;
             }
         }
 
@@ -926,7 +953,6 @@
         function logMessage(message) {
             const previousMessage = messageLog.innerHTML;
             messageLog.innerHTML = message + (previousMessage ? '<br>' + previousMessage : '');
-            // Keep only last N messages if it gets too long (optional)
             const maxMessages = 10;
             const messages = messageLog.innerHTML.split('<br>');
             if (messages.length > maxMessages) {
@@ -939,13 +965,7 @@
 
         // --- Game Initialization ---
         window.onload = () => {
-            // Add IDs to spaces if not already present (for easier selection)
-            // This is done in HTML now with id="space-N"
-            
-            // Wrap existing content of each space into a .content div
-            // and add a .token-container div
             document.querySelectorAll('.board .space').forEach(spaceEl => {
-                // Check if already processed to avoid re-wrapping on potential reloads/updates
                 if (!spaceEl.querySelector('.content')) {
                     const contentWrapper = document.createElement('div');
                     contentWrapper.classList.add('content');
@@ -960,8 +980,7 @@
                     spaceEl.appendChild(tokenContainer);
                 }
             });
-
-            initializeGame(2); // Start with 2 players
+            initializeGame(2); // Start with 2 players by default
         };
 
     </script>
