@@ -126,6 +126,327 @@
         .space-park-lane { grid-column: 11; grid-row: 8; }
         .space-super-tax { grid-column: 11; grid-row: 9; }
         .space-mayfair { grid-column: 11; grid-row: 10; }
+/* Styling for text elements on side properties */
+        .left-col .name, .right-col .name,
+        .left-col .price, .right-col .price,
+        .left-col.space > div:not(.color-bar):not(.name):not(.price), /* For stations/utilities text */
+        .right-col.space > div:not(.color-bar):not(.name):not(.price) {
+            font-size: 7.5px;
+            line-height: 1.1;
+        }
+        
+        .left-col .name, .right-col .name {
+            text-align: center;
+            white-space: normal; /* To respect <br> tags */
+            width: 22px; /* Unrotated width: enough for 2 lines of 7.5px text. Becomes thickness. */
+            /* flex-grow: 1; is inherited from .property .name, crucial */
+            margin: 1px 0;
+        }
+
+        .left-col.property .name, .left-col.space .station-icon + div, .left-col.space .utility-icon + div, .left-col.space .tax-icon + div, .left-col.space .chance-icon + div, .left-col.space .community-chest-icon + div {
+            transform: rotate(90deg);
+        }
+        .right-col.property .name, .right-col.space .station-icon + div, .right-col.space .utility-icon + div, .right-col.space .tax-icon + div, .right-col.space .chance-icon + div, .right-col.space .community-chest-icon + div {
+            transform: rotate(-90deg);
+        }
+        /* Ensure price is not rotated if .name is specific */
+         .left-col .price, .right-col .price {
+            transform: none !important; /* Price itself should not be rotated again */
+         }
+
+
+        .top-row.property .name, .top-row.space .station-icon + div, .top-row.space .utility-icon + div { /* Targeting text below icon */
+             transform: rotate(180deg);
+        }
+         .top-row .price {
+            transform: rotate(180deg);
+         }
+
+
+        /* Corner specific text adjustments */
+        .space-jail .just { position: absolute; top: 15px; left: 5px; transform: rotate(45deg); font-size: 10px;}
+        .space-jail .visiting { position: absolute; bottom: 15px; right: 5px; transform: rotate(45deg); font-size: 10px;}
+        .space-go .arrow { font-size: 30px; color: #d60000; line-height: 1; }
+
+
+        /* Center Area */
+        .center-area {
+            grid-column: 2 / span 9;
+            grid-row: 2 / span 9;
+            background-color: #ddebe0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            border: 2px solid black;
+            padding: 20px;
+        }
+        .game-title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #d60000;
+            text-shadow: 2px 2px #000;
+            letter-spacing: 2px;
+        }
+        .card-pile-placeholder {
+            width: 150px;
+            height: 100px;
+            border: 2px dashed #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            font-weight: 500;
+        }
+        .card-piles-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        /* Color definitions */
+        .brown { background-color: #955436; }
+        .light-blue { background-color: #aae0fa; }
+        .pink { background-color: #d93a96; }
+        .orange { background-color: #f7941d; }
+        .red { background-color: #ed1b24; }
+        .yellow { background-color: #fff200; }
+        .green { background-color: #1fb25a; }
+        .dark-blue { background-color: #0072bb; }
+
+        /* Utility and Station Icons */
+        .station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon {
+            font-size: 20px; /* Slightly smaller icons */
+            margin-bottom: 3px;
+        }
+        .station-icon::before { content: "🚂"; }
+        .utility-icon.electric::before { content: "💡"; }
+        .utility-icon.water::before { content: "💧"; }
+        .tax-icon.income::before { content: "💸"; }
+        .tax-icon.super::before { content: "💎"; }
+        .chance-icon::before { content: "❓"; }
+        .community-chest-icon::before { content: "🎁"; }
+
+    </style>
+    </head>
+<body>
+    <div class="board">
+        <div class="space corner space-go-to-jail">
+            <div>GO TO</div>
+            <div style="font-size: 30px;">🚓</div>
+            <div>JAIL</div>
+        </div>
+
+        <div class="space property top-row space-strand">
+            <div class="color-bar red"></div>
+            <div class="name">STRAND</div>
+            <div class="price">£220</div>
+        </div>
+        <div class="space top-row space-chance-top">
+            <div class="chance-icon"></div>
+            <div>CHANCE</div>
+        </div>
+        <div class="space property top-row space-fleet-street">
+            <div class="color-bar red"></div>
+            <div class="name">FLEET STREET</div>
+            <div class="price">£220</div>
+        </div>
+        <div class="space property top-row space-trafalgar-square">
+            <div class="color-bar red"></div>
+            <div class="name">TRAFALGAR SQUARE</div>
+            <div class="price">£240</div>
+        </div>
+        <div class="space top-row space-fenchurch-st-station">
+            <div class="station-icon"></div>
+            <div>FENCHURCH ST.<br>STATION</div>
+            <div class="price">£200</div>
+        </div>
+        <div class="space property top-row space-leicester-square">
+            <div class="color-bar yellow"></div>
+            <div class="name">LEICESTER SQUARE</div>
+            <div class="price">£260</div>
+        </div>
+        <div class="space property top-row space-coventry-street">
+            <div class="color-bar yellow"></div>
+            <div class="name">COVENTRY STREET</div>
+            <div class="price">£260</div>
+        </div>
+        <div class="space top-row space-water-works">
+            <div class="utility-icon water"></div>
+            <div>WATER WORKS</div>
+            <div class="price">£150</div>
+        </div>
+        <div class="space property top-row space-piccadilly">
+            <div class="color-bar yellow"></div>
+            <div class="name">PICCADILLY</div>
+            <div class="price">£280</div>
+        </div>
+
+        <div class="space corner space-free-parking">
+            <div>FREE</div>
+            <div style="font-size: 30px;">🅿️</div>
+            <div>PARKING</div>
+        </div>
+
+        <div class="space property left-col space-vine-street">
+            <div class="color-bar orange"></div>
+            <div class="name">VINE STREET</div>
+            <div class="price">£200</div>
+        </div>
+        <div class="space property left-col space-marlborough-street">
+            <div class="color-bar orange"></div>
+            <div class="name">MARLBOROUGH STREET</div>
+            <div class="price">£180</div>
+        </div>
+        <div class="space left-col space-community-chest-left">
+            <div class="community-chest-icon"></div>
+            <div>COMMUNITY CHEST</div>
+        </div>
+        <div class="space property left-col space-bow-street">
+            <div class="color-bar orange"></div>
+            <div class="name">BOW STREET</div>
+            <div class="price">£180</div>
+        </div>
+        <div class="space left-col space-marylebone-station">
+             <div class="station-icon"></div>
+            <div>MARYLEBONE STATION</div>
+            <div class="price">£200</div>
+        </div>
+        <div class="space property left-col space-northumberland-avenue">
+            <div class="color-bar pink"></div>
+            <div class="name">NORTHUMBERLAND<br>AVENUE</div>
+            <div class="price">£160</div>
+        </div>
+        <div class="space property left-col space-whitehall">
+            <div class="color-bar pink"></div>
+            <div class="name">WHITEHALL</div>
+            <div class="price">£140</div>
+        </div>
+        <div class="space left-col space-electric-company">
+            <div class="utility-icon electric"></div>
+            <div>ELECTRIC COMPANY</div>
+            <div class="price">£150</div>
+        </div>
+        <div class="space property left-col space-pall-mall">
+            <div class="color-bar pink"></div>
+            <div class="name">PALL MALL</div>
+            <div class="price">£140</div>
+        </div>
+
+        <div class="space corner space-jail">
+            <div class="just">JUST</div>
+            <div style="font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;">👮</div>
+            <div class="visiting">VISITING</div>
+        </div>
+
+        <div class="space property space-pentonville-road">
+            <div class="color-bar light-blue"></div>
+            <div class="name">PENTONVILLE ROAD</div>
+            <div class="price">£120</div>
+        </div>
+        <div class="space property space-euston-road">
+            <div class="color-bar light-blue"></div>
+            <div class="name">EUSTON ROAD</div>
+            <div class="price">£100</div>
+        </div>
+        <div class="space space-chance-bottom">
+            <div class="chance-icon"></div>
+            <div>CHANCE</div>
+        </div>
+        <div class="space property space-the-angel-islington">
+            <div class="color-bar light-blue"></div>
+            <div class="name">THE ANGEL,<br>ISLINGTON</div>
+            <div class="price">£100</div>
+        </div>
+        <div class="space space-kings-cross">
+            <div class="station-icon"></div>
+            <div>KING'S CROSS STATION</div>
+            <div class="price">£200</div>
+        </div>
+        <div class="space space-income-tax">
+            <div class="tax-icon income"></div>
+            <div>INCOME TAX</div>
+            <div>PAY £200</div>
+        </div>
+        <div class="space property space-whitechapel-road">
+            <div class="color-bar brown"></div>
+            <div class="name">WHITECHAPEL ROAD</div>
+            <div class="price">£60</div>
+        </div>
+        <div class="space space-community-chest-bottom">
+            <div class="community-chest-icon"></div>
+            <div>COMMUNITY CHEST</div>
+        </div>
+        <div class="space property space-old-kent-road">
+            <div class="color-bar brown"></div>
+            <div class="name">OLD KENT ROAD</div>
+            <div class="price">£60</div>
+        </div>
+
+        <div class="space corner space-go">
+            <div>COLLECT £200 SALARY AS YOU PASS</div>
+            <div class="arrow">➔</div>
+            <div>GO</div>
+        </div>
+
+        <div class="space property right-col space-mayfair">
+            <div class="color-bar dark-blue"></div>
+            <div class="name">MAYFAIR</div>
+            <div class="price">£400</div>
+        </div>
+        <div class="space right-col space-super-tax">
+            <div class="tax-icon super"></div>
+            <div>SUPER TAX</div>
+            <div>PAY £100</div>
+        </div>
+        <div class="space property right-col space-park-lane">
+            <div class="color-bar dark-blue"></div>
+            <div class="name">PARK LANE</div>
+            <div class="price">£350</div>
+        </div>
+        <div class="space right-col space-chance-right">
+            <div class="chance-icon"></div>
+            <div>CHANCE</div>
+        </div>
+        <div class="space right-col space-liverpool-st-station">
+            <div class="station-icon"></div>
+            <div>LIVERPOOL ST.<br>STATION</div>
+            <div class="price">£200</div>
+        </div>
+        <div class="space property right-col space-bond-street">
+            <div class="color-bar green"></div>
+            <div class="name">BOND STREET</div>
+            <div class="price">£320</div>
+        </div>
+        <div class="space right-col space-community-chest-right">
+            <div class="community-chest-icon"></div>
+            <div>COMMUNITY CHEST</div>
+        </div>
+        <div class="space property right-col space-oxford-street">
+            <div class="color-bar green"></div>
+            <div class="name">OXFORD STREET</div>
+            <div class="price">£300</div>
+        </div>
+        <div class="space property right-col space-regent-street">
+            <div class="color-bar green"></div>
+            <div class="name">REGENT STREET</div>
+            <div class="price">£300</div>
+        </div>
+
+        <div class="center-area">
+            <div class="game-title">MONOPOLY</div>
+            <div class="card-piles-container">
+                <div class="card-pile-placeholder">CHANCE CARDS</div>
+                <div class="card-pile-placeholder">COMMUNITY CHEST CARDS</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+    </script>
 
 
         </body>
