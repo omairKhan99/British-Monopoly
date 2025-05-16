@@ -72,11 +72,16 @@
             padding: 1px;
         }
         .player-token {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            border: 1px solid black;
-            box-shadow: 0 0 3px rgba(0,0,0,0.5);
+            width: 22px;  /* Adjusted for emoji size */
+            height: 22px; /* Adjusted for emoji size */
+            font-size: 18px; /* Emoji size */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.2); /* Lighter border */
+            border-radius: 4px; /* Slightly rounded square */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            line-height: 1; /* Ensure emoji is vertically centered */
         }
 
 
@@ -337,7 +342,8 @@
             text-align: left;
             font-size: 0.9em;
         }
-  </style>
+
+    </style>
 </head>
 <body>
     <div class="game-container">
@@ -688,5 +694,295 @@
         </div>
     </div>
 
-    
+    <script>
+        // --- Game Constants ---
+        const TOTAL_SPACES = 40;
+        const PASS_GO_SALARY = 200;
+        const STARTING_MONEY = 1500;
+        const MAX_PLAYERS = 6;
+        // Player visual representations (emojis) and UI colors
+        const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕']; // Horse, Leopard, Elephant, Tiger, Monkey, Dog
+        const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E']; // Red, Blue, Dark Green, Orange, Purple, Brown (for UI elements like name headers)
 
+
+        // --- Game State Variables ---
+        let players = [];
+        let currentPlayerIndex = 0;
+        let dice = [0, 0];
+        let gameInitialized = false;
+
+        // --- DOM Elements ---
+        const rollDiceButton = document.getElementById('rollDiceButton');
+        const dice1Display = document.getElementById('dice1Display');
+        const dice2Display = document.getElementById('dice2Display');
+        const diceTotalDisplay = document.getElementById('diceTotalDisplay');
+        const currentPlayerNameDisplay = document.getElementById('currentPlayerName');
+        const playerInfoContainer = document.getElementById('playerInfoContainer');
+        const messageLog = document.getElementById('messageLog');
+
+        // Board space IDs (same as before)
+        const boardSpaceIds = [
+            'space-0', 'space-1', 'space-2', 'space-3', 'space-4', 'space-5', 'space-6', 'space-7', 'space-8', 'space-9',
+            'space-10', 'space-11', 'space-12', 'space-13', 'space-14', 'space-15', 'space-16', 'space-17', 'space-18', 'space-19',
+            'space-20', 'space-21', 'space-22', 'space-23', 'space-24', 'space-25', 'space-26', 'space-27', 'space-28', 'space-29',
+            'space-30', 'space-31', 'space-32', 'space-33', 'space-34', 'space-35', 'space-36', 'space-37', 'space-38', 'space-39'
+        ];
+
+
+        // --- Game Logic Functions ---
+
+        /**
+         * Initializes the game with a specified number of players.
+         * @param {number} numPlayers - Number of players (2-6).
+         */
+        function initializeGame(numPlayers = 2) {
+            if (gameInitialized) {
+                logMessage("Game already initialized.");
+                return;
+            }
+            players = [];
+            currentPlayerIndex = 0;
+
+            playerInfoContainer.innerHTML = '';
+            document.querySelectorAll('.player-token').forEach(token => token.remove());
+
+            for (let i = 0; i < numPlayers; i++) {
+                const player = {
+                    id: i,
+                    name: `Player ${i + 1}`,
+                    tokenRepresentation: PLAYER_REPRESENTATIONS[i % PLAYER_REPRESENTATIONS.length],
+                    uiColor: PLAYER_UI_COLORS[i % PLAYER_UI_COLORS.length], // Color for UI elements
+                    money: STARTING_MONEY,
+                    currentPosition: 0,
+                    properties: [],
+                    inJail: false,
+                    jailTurns: 0,
+                    getOutOfJailFreeCards: 0,
+                    tokenElement: null,
+                    infoElement: null
+                };
+                players.push(player);
+                createPlayerToken(player);
+                createPlayerInfoDisplay(player);
+            }
+            updateAllPlayerInfoDisplays();
+            updateCurrentPlayerDisplay();
+            logMessage(`Monopoly game started with ${numPlayers} players. ${players[0].name}'s turn.`);
+            gameInitialized = true;
+            rollDiceButton.disabled = false;
+        }
+
+        /**
+         * Creates a visual token (emoji) for a player and adds it to the board.
+         * @param {object} player - The player object.
+         */
+        function createPlayerToken(player) {
+            const token = document.createElement('div');
+            token.classList.add('player-token');
+            token.innerHTML = player.tokenRepresentation; // Set emoji as content
+            token.setAttribute('title', player.name); // Tooltip for player name
+            player.tokenElement = token;
+            placeTokenOnBoard(player);
+        }
+
+        /**
+         * Creates the UI element to display player's information.
+         * Player name header will use player.uiColor.
+         * @param {object} player - The player object.
+         */
+        function createPlayerInfoDisplay(player) {
+            const infoDiv = document.createElement('div');
+            infoDiv.classList.add('player-info');
+            infoDiv.id = `player-info-${player.id}`;
+            infoDiv.innerHTML = `
+                <h3 style="color: ${player.uiColor};">${player.name} (${player.tokenRepresentation})</h3>
+                <p>Money: <span class="money-display">£${player.money}</span></p>
+                <p>Position: <span class="position-display">GO</span></p>
+            `;
+            player.infoElement = infoDiv;
+            playerInfoContainer.appendChild(infoDiv);
+        }
+
+        /**
+         * Updates the displayed information for a single player.
+         * @param {object} player - The player object.
+         */
+        function updatePlayerInfoDisplay(player) {
+            if (player.infoElement) {
+                player.infoElement.querySelector('.money-display').textContent = `£${player.money}`;
+                const spaceElement = document.getElementById(boardSpaceIds[player.currentPosition]);
+                let spaceName = `Space ${player.currentPosition}`; // Default
+                if (spaceElement) {
+                    // Try to get a descriptive name from the space's content
+                    const nameElement = spaceElement.querySelector('.content .name');
+                    if (nameElement) {
+                        spaceName = nameElement.textContent.trim();
+                    } else {
+                        // Fallback for non-property spaces like GO, Jail, Chance etc.
+                        const mainTextElement = spaceElement.querySelector('.content > div:first-child');
+                        if (mainTextElement) {
+                           spaceName = mainTextElement.textContent.trim().split('\n')[0];
+                        }
+                    }
+                }
+                player.infoElement.querySelector('.position-display').textContent = spaceName.split('\n')[0];
+            }
+            // Highlight active player
+            document.querySelectorAll('.player-info').forEach(el => el.classList.remove('active-player'));
+            if (players[currentPlayerIndex] && players[currentPlayerIndex].infoElement) {
+                players[currentPlayerIndex].infoElement.classList.add('active-player');
+            }
+        }
+
+        /**
+         * Updates information for all players.
+         */
+        function updateAllPlayerInfoDisplays() {
+            players.forEach(p => updatePlayerInfoDisplay(p));
+        }
+
+
+        /**
+         * Places or moves a player's token to their currentPosition on the board.
+         * @param {object} player - The player object.
+         */
+        function placeTokenOnBoard(player) {
+            const currentSpaceId = boardSpaceIds[player.currentPosition];
+            const spaceElement = document.getElementById(currentSpaceId);
+            if (spaceElement) {
+                const tokenContainer = spaceElement.querySelector('.token-container');
+                if (tokenContainer) {
+                    if (player.tokenElement.parentNode) {
+                        player.tokenElement.parentNode.removeChild(player.tokenElement);
+                    }
+                    tokenContainer.appendChild(player.tokenElement);
+                } else {
+                    console.error(`Token container not found for space ID: ${currentSpaceId}`);
+                }
+            } else {
+                console.error(`Space element not found for ID: ${currentSpaceId}`);
+            }
+        }
+
+        /**
+         * Simulates rolling two dice.
+         * @returns {Array<number>} - Array containing results of two dice [d1, d2].
+         */
+        function rollDice() {
+            dice[0] = Math.floor(Math.random() * 6) + 1;
+            dice[1] = Math.floor(Math.random() * 6) + 1;
+            dice1Display.textContent = dice[0];
+            dice2Display.textContent = dice[1];
+            diceTotalDisplay.textContent = dice[0] + dice[1];
+            return dice;
+        }
+
+        /**
+         * Moves the current player based on the dice roll.
+         */
+        function handlePlayerTurn() {
+            if (!gameInitialized) {
+                logMessage("Please initialize the game first.");
+                return;
+            }
+            rollDiceButton.disabled = true;
+
+            const currentPlayer = players[currentPlayerIndex];
+            const diceResult = rollDice();
+            const steps = diceResult[0] + diceResult[1];
+
+            logMessage(`${currentPlayer.name} (${currentPlayer.tokenRepresentation}) rolled ${diceResult[0]} + ${diceResult[1]} = ${steps}.`);
+
+            const oldPosition = currentPlayer.currentPosition;
+            currentPlayer.currentPosition = (oldPosition + steps) % TOTAL_SPACES;
+
+            if (currentPlayer.currentPosition < oldPosition && oldPosition + steps >= TOTAL_SPACES) {
+                currentPlayer.money += PASS_GO_SALARY;
+                logMessage(`${currentPlayer.name} passed GO and collected £${PASS_GO_SALARY}.`);
+            }
+
+            placeTokenOnBoard(currentPlayer);
+            updatePlayerInfoDisplay(currentPlayer); // Update money and position display
+
+            const spaceElement = document.getElementById(boardSpaceIds[currentPlayer.currentPosition]);
+            let newSpaceName = `Space ${currentPlayer.currentPosition}`;
+            if (spaceElement) {
+                const nameElement = spaceElement.querySelector('.content .name');
+                 if (nameElement) {
+                    newSpaceName = nameElement.textContent.trim();
+                } else {
+                    const mainTextElement = spaceElement.querySelector('.content > div:first-child');
+                    if (mainTextElement) {
+                       newSpaceName = mainTextElement.textContent.trim().split('\n')[0];
+                    }
+                }
+            }
+            logMessage(`${currentPlayer.name} landed on ${newSpaceName.split('\n')[0]}.`);
+
+            // Placeholder for landing actions
+            setTimeout(() => {
+                // Future: Call function like handleLandingOnSpace(currentPlayer);
+                switchTurn();
+                rollDiceButton.disabled = false;
+            }, 1000);
+        }
+
+        /**
+         * Switches to the next player's turn.
+         */
+        function switchTurn() {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            updateCurrentPlayerDisplay();
+            logMessage(`${players[currentPlayerIndex].name}'s (${players[currentPlayerIndex].tokenRepresentation}) turn.`);
+            updateAllPlayerInfoDisplays();
+        }
+
+        /**
+         * Updates the display for whose turn it is.
+         */
+        function updateCurrentPlayerDisplay() {
+            if (players.length > 0) {
+                currentPlayerNameDisplay.textContent = `${players[currentPlayerIndex].name} (${players[currentPlayerIndex].tokenRepresentation})`;
+            }
+        }
+
+        /**
+         * Logs a message to the game's message log.
+         * @param {string} message - The message to log.
+         */
+        function logMessage(message) {
+            const previousMessage = messageLog.innerHTML;
+            messageLog.innerHTML = message + (previousMessage ? '<br>' + previousMessage : '');
+            const maxMessages = 10;
+            const messages = messageLog.innerHTML.split('<br>');
+            if (messages.length > maxMessages) {
+                messageLog.innerHTML = messages.slice(0, maxMessages).join('<br>');
+            }
+        }
+
+        // --- Event Listeners ---
+        rollDiceButton.addEventListener('click', handlePlayerTurn);
+
+        // --- Game Initialization ---
+        window.onload = () => {
+            document.querySelectorAll('.board .space').forEach(spaceEl => {
+                if (!spaceEl.querySelector('.content')) {
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.classList.add('content');
+                    while (spaceEl.firstChild) {
+                        contentWrapper.appendChild(spaceEl.firstChild);
+                    }
+                    spaceEl.appendChild(contentWrapper);
+                }
+                if (!spaceEl.querySelector('.token-container')) {
+                    const tokenContainer = document.createElement('div');
+                    tokenContainer.classList.add('token-container');
+                    spaceEl.appendChild(tokenContainer);
+                }
+            });
+            initializeGame(2); // Start with 2 players by default
+        };
+
+    </script>
+</body>
+</html>
