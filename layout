@@ -17,6 +17,7 @@
             min-height: 100vh;
             padding: 20px;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .game-container {
@@ -59,7 +60,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 70%; /* Adjust as needed */
+            height: 70%; 
+            height: 70%;
+            width: 100%
         }
         .space .token-container {
             width: 100%;
@@ -81,15 +84,26 @@
             border: 1px solid rgba(0,0,0,0.2); /* Lighter border */
             border-radius: 4px; /* Slightly rounded square */
             box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            line-height: 1; /* Ensure emoji is vertically centered */
+            line-height: 1;
         }
-
+        .owner-marker-container {
+            height: 5%; /* Space for owner marker */
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Place marker at the bottom of its container */
+        }
+        .owner-marker {
+            width: 80%;
+            height: 5px; /* Height of the color strip */
+            border-top: 1px solid black; /* Optional: border for the marker */
+        }
 
         .corner {
             font-weight: bold;
             font-size: 14px;
         }
-        .corner .content { height: 80%; } /* More space for corner text */
+        .corner .content { height: 80%; } 
         .corner .token-container { height: 20%; }
 
 
@@ -864,10 +878,23 @@
             }
         }
 
-        /**
-         * Simulates rolling two dice.
-         * @returns {Array<number>} - Array containing results of two dice [d1, d2].
-         */
+        function updateOwnerMarker(spaceIndex) {
+            const spaceData = boardData[spaceIndex];
+            const spaceElement = document.getElementById(spaceData.id);
+            if (spaceElement && (spaceData.type === 'property' || spaceData.type === 'station' || spaceData.type === 'utility')) {
+                const ownerMarkerElement = spaceElement.querySelector('.owner-marker');
+                if (ownerMarkerElement) {
+                    if (spaceData.ownerId !== null && players[spaceData.ownerId]) {
+                        ownerMarkerElement.style.backgroundColor = players[spaceData.ownerId].uiColor;
+                    } else {
+                        ownerMarkerElement.style.backgroundColor = 'transparent'; // Or some default for unowned
+                    }
+                }
+            }
+        }
+
+
+
         function rollDice() {
             dice[0] = Math.floor(Math.random() * 6) + 1;
             dice[1] = Math.floor(Math.random() * 6) + 1;
@@ -899,6 +926,7 @@
             if (currentPlayer.currentPosition < oldPosition && oldPosition + steps >= TOTAL_SPACES) {
                 currentPlayer.money += PASS_GO_SALARY;
                 logMessage(`${currentPlayer.name} passed GO and collected £${PASS_GO_SALARY}.`);
+                updatePlayerInfoDisplay(currentPlayer);
             }
 
             placeTokenOnBoard(currentPlayer);
