@@ -17,7 +17,7 @@
             min-height: 100vh;
             padding: 20px;
             margin: 0;
-            overflow-x: hidden; /* Prevent horizontal scroll if modal peeks */
+            overflow-x: hidden; 
         }
 
         .game-container {
@@ -61,11 +61,11 @@
             align-items: center;
             justify-content: center;
             height: 70%;
-            width: 100%; /* Ensure content takes full width */
+            width: 100%; 
         }
         .space .token-container {
             width: 100%;
-            height: 25%; /* Slightly reduced to make space for owner marker */
+            height: 25%; 
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -99,35 +99,15 @@
         }
 
 
-        .corner {
-            font-weight: bold;
-            font-size: 14px;
-        }
+        .corner { font-weight: bold; font-size: 14px; }
         .corner .content { height: 80%; }
         .corner .token-container { height: 20%; }
 
+        .property .color-bar { height: 15px; width: 100%; border-bottom: 1px solid #333; margin-bottom: 1px; }
+        .property .name { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 1px 0; font-weight: 500; width: 100%; }
+        .property .price { font-weight: 600; margin-top: 1px; }
 
-        .property .color-bar {
-            height: 15px;
-            width: 100%;
-            border-bottom: 1px solid #333;
-            margin-bottom: 1px;
-        }
-        .property .name {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1px 0;
-            font-weight: 500;
-            width: 100%;
-        }
-        .property .price {
-            font-weight: 600;
-            margin-top: 1px;
-        }
-
-        /* Grid position styles (space-go, space-old-kent-road etc.) remain the same */
+        /* Grid position styles*/
         .row-1 { grid-row: 1; } .row-11 { grid-row: 11; } .col-1 { grid-column: 1; } .col-11 { grid-column: 11; }
         .space-go { grid-column: 11; grid-row: 11; } .space-old-kent-road { grid-column: 10; grid-row: 11; } .space-community-chest-bottom { grid-column: 9; grid-row: 11; } .space-whitechapel-road { grid-column: 8; grid-row: 11; } .space-income-tax { grid-column: 7; grid-row: 11; } .space-kings-cross { grid-column: 6; grid-row: 11; } .space-the-angel-islington { grid-column: 5; grid-row: 11; } .space-chance-bottom { grid-column: 4; grid-row: 11; } .space-euston-road { grid-column: 3; grid-row: 11; } .space-pentonville-road { grid-column: 2; grid-row: 11; } .space-jail { grid-column: 1; grid-row: 11; }
         .space-pall-mall { grid-column: 1; grid-row: 10; } .space-electric-company { grid-column: 1; grid-row: 9; } .space-whitehall { grid-column: 1; grid-row: 8; } .space-northumberland-avenue { grid-column: 1; grid-row: 7; } .space-marylebone-station { grid-column: 1; grid-row: 6; } .space-bow-street { grid-column: 1; grid-row: 5; } .space-community-chest-left { grid-column: 1; grid-row: 4; } .space-marlborough-street { grid-column: 1; grid-row: 3; } .space-vine-street { grid-column: 1; grid-row: 2; } .space-free-parking { grid-column: 1; grid-row: 1; }
@@ -174,81 +154,21 @@
         .modal-button.secondary:hover { background-color: #d32f2f; }
         .message-log { margin-top: 15px; padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; min-height: 50px; text-align: left; font-size: 0.9em; max-height: 100px; overflow-y: auto;}
 
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            transform: translateY(-50px) scale(0.95); /* Initial state for animation */
-            transition: transform 0.3s ease-out;
-            border-top: 10px solid #d60000; /* Monopoly Red accent */
-        }
-        .modal-overlay.visible .modal-content {
-            transform: translateY(0) scale(1); /* Final state for animation */
-        }
-        .modal-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        .modal-message {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+        
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); width: 90%; max-width: 450px; text-align: center; transform: translateY(-50px) scale(0.95); transition: transform 0.3s ease-out; border-top: 10px solid #d60000; }
+        .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); }
+        .modal-title { font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 15px; }
+        .modal-message { font-size: 1.1em; color: #555; margin-bottom: 20px; line-height: 1.6; }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="board">
-            <div id="space-1" class="space property space-old-kent-road">
-                <div class="content">
-                    <div class="color-bar brown"></div>
-                    <div class="name">OLD KENT ROAD</div>
-                    <div class="price">£60</div>
-                </div>
-                <div class="token-container"></div>
-                <div class="owner-marker-container"><div class="owner-marker"></div></div>
-            </div>
-            <div id="space-0" class="space corner space-go">
-                <div class="content">
-                    <div>COLLECT £200 SALARY AS YOU PASS</div>
-                    <div class="arrow">➔</div>
-                    <div>GO</div>
-                </div>
-                <div class="token-container"></div>
-                <div class="owner-marker-container"></div> </div>
+            <div id="space-0" class="space corner space-go"> <div class="content"> <div>COLLECT £200 SALARY AS YOU PASS</div> <div class="arrow">➔</div> <div>GO</div> </div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
+            <div id="space-1" class="space property space-old-kent-road"> <div class="content"> <div class="color-bar brown"></div> <div class="name">OLD KENT ROAD</div> <div class="price">£60</div> </div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
             <div id="space-2" class="space space-community-chest-bottom"> <div class="content"><div class="community-chest-icon"></div><div>COMMUNITY CHEST</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
             <div id="space-3" class="space property space-whitechapel-road"> <div class="content"><div class="color-bar brown"></div><div class="name">WHITECHAPEL ROAD</div><div class="price">£60</div></div> <div class="token-container"></div> <div class="owner-marker-container"><div class="owner-marker"></div></div> </div>
             <div id="space-4" class="space space-income-tax"> <div class="content"><div class="tax-icon income"></div><div>INCOME TAX</div><div>PAY £200</div></div> <div class="token-container"></div> <div class="owner-marker-container"></div> </div>
