@@ -11,20 +11,15 @@ const MAX_HOUSES = 4;
 const HOTEL_LEVEL = 5; 
 
 
-// Board position constants for cards
+
 const GO_POSITION = 0;
-const KINGS_CROSS_POSITION = 5;
-const MARYLEBONE_POSITION = 15;
-const FENCHURCH_ST_POSITION = 25;
-const LIVERPOOL_ST_POSITION = 35;
-const PALL_MALL_POSITION = 11;
-const MAYFAIR_POSITION = 39;
-const TRAFALGAR_SQ_POSITION = 24;
-const ELECTRIC_COMPANY_POSITION = 12;
-const WATER_WORKS_POSITION = 28;
+const KINGS_CROSS_POSITION = 5; const MARYLEBONE_POSITION = 15; const FENCHURCH_ST_POSITION = 25; const LIVERPOOL_ST_POSITION = 35;
+const PALL_MALL_POSITION = 11; const MAYFAIR_POSITION = 39; const TRAFALGAR_SQ_POSITION = 24;
+const ELECTRIC_COMPANY_POSITION = 12; const WATER_WORKS_POSITION = 28;
 
 
-// --- Game State Variables ---
+
+
 let players = []; // Array to hold player objects
 let currentPlayerIndex = 0; // Index of the current player in the players array
 let dice = [0, 0]; // Array to store the result of the two dice
@@ -35,6 +30,8 @@ let communityChestCards = []; // Array for Community Chest cards
 let chanceCardIndex = 0; // Current index for drawing Chance cards
 let communityChestCardIndex = 0; // Current index for drawing Community Chest cards
 let rolledDoublesToGetOutOfJailThisAction = false; // Flag for specific jail roll action in a turn
+let propertyManagementActionInProgress = false; 
+
 
 
 // --- DOM Elements ---
