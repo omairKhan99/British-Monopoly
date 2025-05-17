@@ -149,7 +149,7 @@
         .dice-area span { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; border: 1px solid #333; background-color: white; font-size: 20px; font-weight: bold; margin: 0 5px; border-radius: 5px; }
         #rollDiceButton, .modal-button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin: 5px;}
         #rollDiceButton:hover, .modal-button:hover { background-color: #45a049; }
-        #rollDiceButton:disabled { background-color: #ccc; cursor: not-allowed; }
+        #rollDiceButton:disabled, .modal-button:disabled { background-color: #ccc; cursor: not-allowed; }
         .modal-button.secondary { background-color: #f44336; }
         .modal-button.secondary:hover { background-color: #d32f2f; }
         .message-log { margin-top: 15px; padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; min-height: 50px; text-align: left; font-size: 0.9em; max-height: 100px; overflow-y: auto;}
@@ -161,7 +161,7 @@
         .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); }
         .modal-title { font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 15px; }
         .modal-message { font-size: 1.1em; color: #555; margin-bottom: 20px; line-height: 1.6; }
-        .modal-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .modal-buttons { display: flex; flex-direction: column; /* Stack jail options */ justify-content: center; gap: 10px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -247,17 +247,12 @@
         const PLAYER_REPRESENTATIONS = ['🐎', '🐆', '🐘', '🐅', '🐒', '🐕'];
         const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080', '#D2691E'];
         const JAIL_POSITION = 10;
+        const JAIL_FINE = 50;
+        const MAX_JAIL_ROLL_ATTEMPTS = 3;
         const GO_POSITION = 0;
-        const KINGS_CROSS_POSITION = 5;
-        const MARYLEBONE_POSITION = 15;
-        const FENCHURCH_ST_POSITION = 25;
-        const LIVERPOOL_ST_POSITION = 35;
-        const PALL_MALL_POSITION = 11;
-        const MAYFAIR_POSITION = 39;
-        const TRAFALGAR_SQ_POSITION = 24;
-        const ELECTRIC_COMPANY_POSITION = 12;
-        const WATER_WORKS_POSITION = 28;
-
+        const KINGS_CROSS_POSITION = 5; const MARYLEBONE_POSITION = 15; const FENCHURCH_ST_POSITION = 25; const LIVERPOOL_ST_POSITION = 35;
+        const PALL_MALL_POSITION = 11; const MAYFAIR_POSITION = 39; const TRAFALGAR_SQ_POSITION = 24;
+        const ELECTRIC_COMPANY_POSITION = 12; const WATER_WORKS_POSITION = 28;
 
         // --- Game State Variables ---
         let players = [];
@@ -267,11 +262,11 @@
         let boardData = [];
         let chanceCards = [];
         let communityChestCards = [];
-        let chanceCardIndex = 0; // To cycle through cards
+        let chanceCardIndex = 0;
         let communityChestCardIndex = 0;
+        let rolledDoublesToGetOutOfJailThisAction = false; // Flag for current action (roll for jail)
 
-
-        // --- DOM Elements ---
+        // --- DOM Elements (same as before) ---
         const rollDiceButton = document.getElementById('rollDiceButton');
         const dice1Display = document.getElementById('dice1Display');
         const dice2Display = document.getElementById('dice2Display');
@@ -286,14 +281,12 @@
         const chanceCardPileDisplay = document.getElementById('chanceCardPile');
         const communityChestCardPileDisplay = document.getElementById('communityChestCardPile');
 
-
-        // --- Card Definitions ---
-        function initializeDecks() {
-            // Standard British Chance Cards (simplified/adapted)
+        // --- Card Definitions & Management (same as before) ---
+        function initializeDecks() { /* ... same as before ... */ 
             chanceCards = [
                 { text: "Advance to Go (Collect £200).", type: "moveTo", value: GO_POSITION, collectGo: true },
                 { text: "Advance to Trafalgar Square. If you pass Go, collect £200.", type: "moveTo", value: TRAFALGAR_SQ_POSITION, collectGo: true },
-                { text: "Advance to Mayfair.", type: "moveTo", value: MAYFAIR_POSITION, collectGo: false }, // Usually no GO collection for direct advance this far
+                { text: "Advance to Mayfair.", type: "moveTo", value: MAYFAIR_POSITION, collectGo: false },
                 { text: "Advance to Pall Mall. If you pass Go, collect £200.", type: "moveTo", value: PALL_MALL_POSITION, collectGo: true },
                 { text: "Advance to the nearest Station. If unowned, you may buy it from the Bank. If owned, pay owner twice the rental to which they are otherwise entitled.", type: "moveToNearest", value: "station", subType: "payDoubleRentOrBuy" },
                 { text: "Advance to the nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total ten times amount thrown.", type: "moveToNearest", value: "utility", subType: "payDiceRollRentOrBuy" },
@@ -306,10 +299,7 @@
                 { text: "Take a trip to King's Cross Station. If you pass Go, collect £200.", type: "moveTo", value: KINGS_CROSS_POSITION, collectGo: true },
                 { text: "You have been elected Chairman of the Board. Pay each player £50.", type: "payEachPlayer", value: 50 },
                 { text: "Your building loan matures. Collect £150.", type: "collectMoney", value: 150 },
-                // { text: "You have won a crossword competition. Collect £100.", type: "collectMoney", value: 100 } // Often included
             ];
-
-            // Standard British Community Chest Cards (simplified/adapted)
             communityChestCards = [
                 { text: "Advance to Go (Collect £200).", type: "moveTo", value: GO_POSITION, collectGo: true },
                 { text: "Bank error in your favour. Collect £200.", type: "collectMoney", value: 200 },
@@ -320,52 +310,23 @@
                 { text: "Grand Opera Night. Collect £50 from every player for opening night seats.", type: "collectFromPlayers", value: 50 },
                 { text: "Holiday Fund matures. Receive £100.", type: "collectMoney", value: 100 },
                 { text: "Income tax refund. Collect £20.", type: "collectMoney", value: 20 },
-                { text: "It is your birthday. Collect £10 from each player.", type: "collectFromPlayers", value: 10 }, // Simplified from "Life insurance matures"
+                { text: "It is your birthday. Collect £10 from each player.", type: "collectFromPlayers", value: 10 },
                 { text: "Pay hospital fees of £100.", type: "payMoney", value: 100 },
-                { text: "Pay school fees of £50.", type: "payMoney", value: 50 }, // Simplified from "Pay school fees of £150"
+                { text: "Pay school fees of £50.", type: "payMoney", value: 50 },
                 { text: "Receive £25 consultancy fee.", type: "collectMoney", value: 25 },
                 { text: "You are assessed for street repairs. £40 per house, £115 per hotel.", type: "streetRepairs", houseCost: 40, hotelCost: 115 },
                 { text: "You have won second prize in a beauty contest. Collect £10.", type: "collectMoney", value: 10 },
-                // { text: "You inherit £100.", type: "collectMoney", value: 100 } // Often included
             ];
-
-            shuffleDeck(chanceCards);
-            shuffleDeck(communityChestCards);
-            updateCardPileDisplays();
+            shuffleDeck(chanceCards); shuffleDeck(communityChestCards); updateCardPileDisplays();
         }
-
-        function shuffleDeck(deck) {
-            for (let i = deck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]]; // Swap elements
-            }
-        }
-
-        function drawCard(deckType) {
-            let card;
-            if (deckType === 'chance') {
-                card = chanceCards[chanceCardIndex];
-                chanceCardIndex = (chanceCardIndex + 1) % chanceCards.length;
-            } else { // community-chest
-                card = communityChestCards[communityChestCardIndex];
-                communityChestCardIndex = (communityChestCardIndex + 1) % communityChestCards.length;
-            }
-            // In a real game, drawn "Get Out of Jail Free" cards are removed from the deck until used.
-            // For simplicity now, we'll just cycle. This can be enhanced.
-            logMessage(`${players[currentPlayerIndex].name} drew a ${deckType} card: "${card.text}"`);
-            updateCardPileDisplays();
-            return card;
-        }
-        
-        function updateCardPileDisplays() {
-            chanceCardPileDisplay.innerHTML = `CHANCE <br> (${chanceCards.length - chanceCardIndex} left)`;
-            communityChestCardPileDisplay.innerHTML = `COMMUNITY CHEST <br> (${communityChestCards.length - communityChestCardIndex} left)`;
-        }
+        function shuffleDeck(deck) { for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; } }
+        function drawCard(deckType) { let card; if (deckType === 'chance') { card = chanceCards[chanceCardIndex]; chanceCardIndex = (chanceCardIndex + 1) % chanceCards.length; } else { card = communityChestCards[communityChestCardIndex]; communityChestCardIndex = (communityChestCardIndex + 1) % communityChestCards.length; } logMessage(`${players[currentPlayerIndex].name} drew a ${deckType} card: "${card.text}"`); updateCardPileDisplays(); return card; }
+        function updateCardPileDisplays() { chanceCardPileDisplay.innerHTML = `CHANCE <br> (${chanceCards.length} cards)`; communityChestCardPileDisplay.innerHTML = `COMMUNITY CHEST <br> (${communityChestCards.length} cards)`; } // Simplified display
 
 
-        // --- Board Data Initialization (same as before) ---
-        function initializeBoardData() {
-            boardData = [
+        // --- Board Data Initialization (same) ---
+        function initializeBoardData() { /* ... same as before ... */ 
+             boardData = [
                 { id: 'space-0', name: "GO", type: "go", group: "corner" },
                 { id: 'space-1', name: "Old Kent Road", type: "property", price: 60, rent: [2, 10, 30, 90, 160, 250], group: "brown", ownerId: null, houseCost: 50, houses: 0 },
                 { id: 'space-2', name: "Community Chest", type: "community-chest", group: "event" },
@@ -411,15 +372,14 @@
                 if (!('ownerId' in space) && (space.type === 'property' || space.type === 'station' || space.type === 'utility')) {
                     space.ownerId = null;
                 }
-                if (space.type === 'property' && !('houses' in space)) { // Ensure all properties have houses field
-                    space.houses = 0; // 0 for no houses, 5 for hotel
+                if (space.type === 'property' && !('houses' in space)) { 
+                    space.houses = 0; 
                 }
             });
         }
 
-
-        // --- Modal Functions (same as before) ---
-        function showModal(title, message, buttonsConfig = [{ text: "OK", action: hideModal }]) {
+        // --- Modal Functions (same) ---
+        function showModal(title, message, buttonsConfig = [{ text: "OK", action: null }]) {
             modalTitle.textContent = title;
             modalMessage.innerHTML = message;
             modalButtons.innerHTML = '';
@@ -428,9 +388,10 @@
                 button.textContent = btnConfig.text;
                 button.classList.add('modal-button');
                 if (btnConfig.class) button.classList.add(btnConfig.class);
+                if (btnConfig.disabled) button.disabled = true;
                 button.onclick = () => {
-                    if (btnConfig.action) btnConfig.action(); // Execute action first
-                    hideModal(); // Then hide modal
+                    hideModal(); // Always hide modal after any button click
+                    if (btnConfig.action) btnConfig.action();
                 };
                 modalButtons.appendChild(button);
             });
@@ -438,61 +399,44 @@
         }
         function hideModal() { eventModal.classList.remove('visible'); }
 
-        // --- Game Initialization (includes initializeDecks) ---
-        function initializeGame(numPlayers = 2) {
+        // --- Game Initialization, Player Token/Info (same) ---
+        function initializeGame(numPlayers = 2) { /* ... same as before, includes initializeDecks ... */ 
             if (gameInitialized) { logMessage("Game already initialized."); return; }
-            initializeBoardData();
-            initializeDecks(); // Initialize and shuffle decks
-            players = [];
-            currentPlayerIndex = 0;
-            playerInfoContainer.innerHTML = '';
+            initializeBoardData(); initializeDecks(); 
+            players = []; currentPlayerIndex = 0; playerInfoContainer.innerHTML = '';
             document.querySelectorAll('.player-token').forEach(token => token.remove());
             document.querySelectorAll('.owner-marker').forEach(marker => marker.style.backgroundColor = 'transparent');
-
             for (let i = 0; i < numPlayers; i++) {
                 const player = {
                     id: i, name: `Player ${i + 1}`,
                     tokenRepresentation: PLAYER_REPRESENTATIONS[i % PLAYER_REPRESENTATIONS.length],
                     uiColor: PLAYER_UI_COLORS[i % PLAYER_UI_COLORS.length],
                     money: STARTING_MONEY, currentPosition: 0, propertiesOwned: [],
-                    inJail: false, jailTurns: 0, getOutOfJailFreeCards: 0,
+                    inJail: false, jailTurnsAttempted: 0, getOutOfJailFreeCards: 0,
                     tokenElement: null, infoElement: null
                 };
-                players.push(player);
-                createPlayerToken(player);
-                createPlayerInfoDisplay(player);
+                players.push(player); createPlayerToken(player); createPlayerInfoDisplay(player);
             }
-            updateAllPlayerInfoDisplays();
-            updateCurrentPlayerDisplay();
+            updateAllPlayerInfoDisplays(); updateCurrentPlayerDisplay();
             logMessage(`Monopoly game started with ${numPlayers} players. ${players[0].name}'s turn.`);
-            gameInitialized = true;
-            rollDiceButton.disabled = false;
+            gameInitialized = true; rollDiceButton.disabled = false;
         }
-
-        // --- Player Token and Info Display Functions (largely same, added GOOJFC display) ---
-        function createPlayerToken(player) { /* ... same as before ... */ 
-            const token = document.createElement('div');
-            token.classList.add('player-token');
-            token.innerHTML = player.tokenRepresentation;
-            token.setAttribute('title', player.name);
-            player.tokenElement = token;
-            placeTokenOnBoard(player);
+        function createPlayerToken(player) { /* ... same ... */ 
+            const token = document.createElement('div'); token.classList.add('player-token'); token.innerHTML = player.tokenRepresentation; token.setAttribute('title', player.name); player.tokenElement = token; placeTokenOnBoard(player);
         }
-        function createPlayerInfoDisplay(player) {
-            const infoDiv = document.createElement('div');
-            infoDiv.classList.add('player-info');
-            infoDiv.id = `player-info-${player.id}`;
+        function createPlayerInfoDisplay(player) { /* ... same, GOOJFC display already there ... */ 
+            const infoDiv = document.createElement('div'); infoDiv.classList.add('player-info'); infoDiv.id = `player-info-${player.id}`;
             infoDiv.innerHTML = `
                 <h3 style="color: ${player.uiColor};">${player.name} (${player.tokenRepresentation})</h3>
                 <p>Money: <span class="money-display">£${player.money}</span></p>
                 <p>Position: <span class="position-display">GO</span></p>
                 <p>Properties: <span class="properties-display">0</span></p>
-                <p>GOOJFC: <span class="goojfc-display">0</span></p> `;
-            player.infoElement = infoDiv;
-            playerInfoContainer.appendChild(infoDiv);
+                <p>GOOJFC: <span class="goojfc-display">0</span></p>
+            `;
+            player.infoElement = infoDiv; playerInfoContainer.appendChild(infoDiv);
         }
-        function updatePlayerInfoDisplay(player) {
-            if (player.infoElement) {
+        function updatePlayerInfoDisplay(player) { /* ... same ... */ 
+             if (player.infoElement) {
                 player.infoElement.querySelector('.money-display').textContent = `£${player.money}`;
                 const spaceData = boardData[player.currentPosition];
                 player.infoElement.querySelector('.position-display').textContent = spaceData.name.split('<br>')[0];
@@ -505,475 +449,382 @@
             }
         }
         function updateAllPlayerInfoDisplays() { players.forEach(p => updatePlayerInfoDisplay(p)); }
-        function placeTokenOnBoard(player) { /* ... same as before ... */ 
+        function placeTokenOnBoard(player) { /* ... same ... */ 
             const currentSpaceHtmlId = boardData[player.currentPosition].id;
             const spaceElement = document.getElementById(currentSpaceHtmlId);
             if (spaceElement) {
                 const tokenContainer = spaceElement.querySelector('.token-container');
-                if (tokenContainer) {
-                    if (player.tokenElement.parentNode) {
-                        player.tokenElement.parentNode.removeChild(player.tokenElement);
-                    }
-                    tokenContainer.appendChild(player.tokenElement);
-                }
+                if (tokenContainer) { if (player.tokenElement.parentNode) { player.tokenElement.parentNode.removeChild(player.tokenElement); } tokenContainer.appendChild(player.tokenElement); }
             }
         }
-        function updateOwnerMarker(spaceIndex) { /* ... same as before ... */ 
+        function updateOwnerMarker(spaceIndex) { /* ... same ... */ 
             const spaceData = boardData[spaceIndex];
             const spaceElement = document.getElementById(spaceData.id);
             if (spaceElement && (spaceData.type === 'property' || spaceData.type === 'station' || spaceData.type === 'utility')) {
                 const ownerMarkerElement = spaceElement.querySelector('.owner-marker');
-                if (ownerMarkerElement) {
-                    if (spaceData.ownerId !== null && players[spaceData.ownerId]) {
-                        ownerMarkerElement.style.backgroundColor = players[spaceData.ownerId].uiColor;
-                    } else {
-                        ownerMarkerElement.style.backgroundColor = 'transparent';
-                    }
-                }
+                if (ownerMarkerElement) { if (spaceData.ownerId !== null && players[spaceData.ownerId]) { ownerMarkerElement.style.backgroundColor = players[spaceData.ownerId].uiColor; } else { ownerMarkerElement.style.backgroundColor = 'transparent'; } }
             }
         }
 
-        // --- Dice Rolling and Turn Management ---
-        function rollDice() { /* ... same as before ... */ 
-            dice[0] = Math.floor(Math.random() * 6) + 1;
-            dice[1] = Math.floor(Math.random() * 6) + 1;
-            dice1Display.textContent = dice[0];
-            dice2Display.textContent = dice[1];
-            diceTotalDisplay.textContent = dice[0] + dice[1];
+        // --- Dice Rolling ---
+        function rollDice() { /* ... same ... */ 
+            dice[0] = Math.floor(Math.random() * 6) + 1; dice[1] = Math.floor(Math.random() * 6) + 1;
+            dice1Display.textContent = dice[0]; dice2Display.textContent = dice[1]; diceTotalDisplay.textContent = dice[0] + dice[1];
             return dice;
         }
-        function handlePlayerTurn() { /* ... largely same, jail logic placeholder ... */ 
+
+        // --- Main Turn Handling ---
+        function handlePlayerTurn() {
             if (!gameInitialized) { logMessage("Please initialize the game first."); return; }
-            rollDiceButton.disabled = true;
-
             const currentPlayer = players[currentPlayerIndex];
+            rolledDoublesToGetOutOfJailThisAction = false; // Reset flag for this turn's specific jail roll
+
             if (currentPlayer.inJail) {
-                // Basic Jail Logic: Option to pay, use card, or roll for doubles
-                // For now, we'll add a modal for this.
-                handleJailTurn(currentPlayer);
-                return;
+                handleJailTurn(currentPlayer); // This will show a modal with options
+            } else {
+                performNormalRollAndMove(currentPlayer);
             }
-
-            const diceResult = rollDice();
-            const steps = diceResult[0] + diceResult[1];
-            logMessage(`${currentPlayer.name} (${currentPlayer.tokenRepresentation}) rolled ${diceResult[0]} + ${diceResult[1]} = ${steps}.`);
-
-            const oldPosition = currentPlayer.currentPosition;
-            let newPosition = (oldPosition + steps) % TOTAL_SPACES;
-            
-            // If landed on "Go To Jail" space (index 30), newPosition is updated by goToJail function
-            // So, check for passing GO *before* potentially being sent to jail by a card/space
-            if (boardData[newPosition].type !== 'go-to-jail' && newPosition < oldPosition && oldPosition + steps >= TOTAL_SPACES) {
-                 // Check if the movement actually crossed index 0
-                if (!(oldPosition + steps === TOTAL_SPACES + newPosition)) { // Avoid double collection if landing on GO
-                    currentPlayer.money += PASS_GO_SALARY;
-                    logMessage(`${currentPlayer.name} passed GO and collected £${PASS_GO_SALARY}.`);
-                }
-            }
-            currentPlayer.currentPosition = newPosition;
-
-
-            placeTokenOnBoard(currentPlayer);
-            updatePlayerInfoDisplay(currentPlayer); // Update after potential GO collection
-            logMessage(`${currentPlayer.name} landed on ${boardData[currentPlayer.currentPosition].name.split('<br>')[0]}.`);
-            handleLandingOnSpace(currentPlayer);
         }
 
-        // --- Landing Actions ---
-        function handleLandingOnSpace(player) {
+        function performNormalRollAndMove(player) {
+            rollDiceButton.disabled = true;
+            const diceResult = rollDice();
+            const steps = diceResult[0] + diceResult[1];
+            logMessage(`${player.name} (${player.tokenRepresentation}) rolled ${diceResult[0]} + ${diceResult[1]} = ${steps}.`);
+
+            const oldPosition = player.currentPosition;
+            let newPosition = (oldPosition + steps) % TOTAL_SPACES;
+
+            // Check for passing GO, only if not sent to Jail directly by the dice roll (which goToJail handles)
+            // This check is primarily for normal movement.
+            if (newPosition < oldPosition && (oldPosition + steps) >= TOTAL_SPACES) { // Standard pass GO
+                 player.money += PASS_GO_SALARY;
+                 logMessage(`${player.name} passed GO and collected £${PASS_GO_SALARY}.`);
+            }
+            player.currentPosition = newPosition;
+
+            placeTokenOnBoard(player);
+            updatePlayerInfoDisplay(player); // Update after potential GO collection
+            logMessage(`${player.name} landed on ${boardData[player.currentPosition].name.split('<br>')[0]}.`);
+            handleLandingOnSpace(player); // This will manage its own flow, including calling endTurnActions
+        }
+
+        // --- Jail Specific Logic ---
+        function handleJailTurn(player) {
+            player.jailTurnsAttempted = player.jailTurnsAttempted || 0; // Ensure initialized
+            player.jailTurnsAttempted++;
+
+            let modalMessageText = `${player.name}, you are in Jail (Attempt ${player.jailTurnsAttempted}/${MAX_JAIL_ROLL_ATTEMPTS}).`;
+            let options = [];
+
+            // Option 1: Try to Roll Doubles (if attempts remaining)
+            if (player.jailTurnsAttempted <= MAX_JAIL_ROLL_ATTEMPTS) {
+                options.push({
+                    text: `Roll for Doubles (Attempt ${player.jailTurnsAttempted})`,
+                    action: () => tryRollOutOfJail(player)
+                });
+            }
+
+            // Option 2: Pay Fine
+            options.push({
+                text: `Pay £${JAIL_FINE} Fine`,
+                action: () => payFineToGetOutOfJail(player),
+                disabled: player.money < JAIL_FINE
+            });
+
+            // Option 3: Use Card
+            if (player.getOutOfJailFreeCards > 0) {
+                options.push({
+                    text: `Use Get Out of Jail Free Card (${player.getOutOfJailFreeCards})`,
+                    action: () => useCardToGetOutOfJail(player)
+                });
+            }
+            
+            // If 3rd attempt failed (and not already out), must pay or use card
+            if (player.jailTurnsAttempted > MAX_JAIL_ROLL_ATTEMPTS) {
+                 modalMessageText = `${player.name}, you are in Jail. Max roll attempts reached. You must pay the fine or use a card.`;
+                 options = options.filter(opt => opt.text.startsWith("Pay") || opt.text.startsWith("Use")); // Keep only pay/card
+                 if (options.length === 0) { // No way to get out (no money, no card)
+                    logMessage(`${player.name} is stuck in jail with no way to get out this turn! (Bankruptcy looms if this were real debt)`);
+                    // In a full game, this might trigger selling assets or bankruptcy. For now, turn ends.
+                    player.jailTurnsAttempted = 0; // Reset for future jail time
+                    endTurnActions(); // Allow other players to continue
+                    return;
+                 }
+            }
+
+
+            showModal("In Jail!", modalMessageText, options);
+        }
+
+        function tryRollOutOfJail(player) {
+            const d = rollDice(); // Updates global dice display
+            logMessage(`${player.name} (in jail) rolled ${d[0]} and ${d[1]}.`);
+            if (d[0] === d[1]) {
+                player.inJail = false;
+                player.jailTurnsAttempted = 0;
+                rolledDoublesToGetOutOfJailThisAction = true; // Set flag
+                logMessage("Doubles! You're out of jail. You move " + (d[0] + d[1]) + " spaces.");
+                
+                // Move player from JAIL_POSITION by the sum of dice
+                // No GO collection when getting out of jail this way
+                player.currentPosition = (JAIL_POSITION + d[0] + d[1]) % TOTAL_SPACES;
+                placeTokenOnBoard(player);
+                updatePlayerInfoDisplay(player);
+                logMessage(`${player.name} moved to ${boardData[player.currentPosition].name.split('<br>')[0]}.`);
+                handleLandingOnSpace(player); // This will eventually call endTurnActions
+            } else {
+                logMessage("No doubles.");
+                if (player.jailTurnsAttempted >= MAX_JAIL_ROLL_ATTEMPTS) {
+                    logMessage("Max roll attempts reached. You must pay or use a card next turn if available.");
+                    // The modal logic in handleJailTurn will re-evaluate options next time.
+                }
+                endTurnActions(); // End turn if no doubles
+            }
+        }
+
+        function payFineToGetOutOfJail(player) {
+            if (player.money >= JAIL_FINE) {
+                player.money -= JAIL_FINE;
+                player.inJail = false;
+                player.jailTurnsAttempted = 0;
+                logMessage(`${player.name} paid £${JAIL_FINE} and is out of jail. Roll for your turn.`);
+                updatePlayerInfoDisplay(player);
+                rollDiceButton.disabled = false; // Allow them to take their normal turn now
+                // The modal is hidden by its button handler. Main turn proceeds with new roll.
+            } else {
+                logMessage(`${player.name} does not have £${JAIL_FINE} to pay the fine.`);
+                // Player remains in jail, modal will re-appear next turn with options based on their state.
+                endTurnActions(); // End this attempt.
+            }
+        }
+
+        function useCardToGetOutOfJail(player) {
+            if (player.getOutOfJailFreeCards > 0) {
+                player.getOutOfJailFreeCards--;
+                player.inJail = false;
+                player.jailTurnsAttempted = 0;
+                logMessage(`${player.name} used a Get Out of Jail Free card and is out of jail. Roll for your turn.`);
+                updatePlayerInfoDisplay(player);
+                rollDiceButton.disabled = false; // Allow them to take their normal turn now
+            } else {
+                 logMessage(`${player.name} has no Get Out of Jail Free cards.`);
+                 endTurnActions();
+            }
+        }
+
+        // --- Landing Actions, Card Effects, Property Logic (largely same as before, ensure endTurnActions is called) ---
+        function handleLandingOnSpace(player) { /* ... same as before, ensuring all paths call an appropriate end-turn function or chain to one ... */ 
             const space = boardData[player.currentPosition];
-            let subsequentAction = () => endTurnActions(); // Default action after modal
+            let subsequentAction = () => endTurnActions(); 
 
             switch (space.type) {
                 case 'property': case 'station': case 'utility':
-                    handleOwnableSpace(player, space); // This function will set its own subsequentAction or call endTurnActions
-                    return; // handleOwnableSpace manages its own flow
+                    handleOwnableSpace(player, space); return;
                 case 'go-to-jail':
-                    goToJail(player); // This also manages its own flow
-                    return;
+                    goToJail(player); return;
                 case 'chance':
                     const chanceCard = drawCard('chance');
                     showModal("Chance Card!", chanceCard.text, [{ text: "OK", action: () => applyCardEffect(player, chanceCard) }]);
-                    return; // applyCardEffect will call endTurnActions
+                    return; 
                 case 'community-chest':
                     const communityCard = drawCard('community-chest');
                     showModal("Community Chest Card!", communityCard.text, [{ text: "OK", action: () => applyCardEffect(player, communityCard) }]);
-                    return; // applyCardEffect will call endTurnActions
+                    return; 
                 case 'tax':
-                    payTax(player, space); // Manages its own flow
-                    return;
+                    payTax(player, space); return;
                 case 'go':
                     logMessage(`${player.name} landed on GO. Collect £${PASS_GO_SALARY}.`);
-                    player.money += PASS_GO_SALARY; // Explicitly collect if landing on GO
-                    updatePlayerInfoDisplay(player);
-                    break; // Fall through to endTurnActions
-                case 'jail':
-                    logMessage(`${player.name} is just visiting Jail.`);
-                    break; // Fall through to endTurnActions
-                case 'free-parking':
-                    logMessage(`${player.name} landed on Free Parking. Take a break!`);
-                    break; // Fall through to endTurnActions
-                default:
-                    logMessage(`Landed on ${space.name} - no special action.`);
-                    break; // Fall through to endTurnActions
+                    if (player.currentPosition === GO_POSITION) { // Ensure they are actually on GO, not just passed it.
+                         player.money += PASS_GO_SALARY; 
+                         updatePlayerInfoDisplay(player);
+                    }
+                    break; 
+                case 'jail': logMessage(`${player.name} is just visiting Jail.`); break; 
+                case 'free-parking': logMessage(`${player.name} landed on Free Parking. Take a break!`); break; 
+                default: logMessage(`Landed on ${space.name} - no special action.`); break; 
             }
-            subsequentAction(); // Call endTurnActions if not handled by specific cases
+            subsequentAction(); 
         }
 
-        function applyCardEffect(player, card) {
+        function applyCardEffect(player, card) { /* ... same as before, ensuring all paths eventually call endTurnActions ... */ 
             logMessage(`Applying card: ${card.text}`);
             let passedGoOnCardMove = false;
+            let actionLeadsToNewSpace = false;
+            let newSpaceToHandle = null;
 
             switch (card.type) {
                 case 'moveTo':
                     const oldPos = player.currentPosition;
                     player.currentPosition = card.value;
-                    if (card.collectGo && player.currentPosition < oldPos) { // Passed GO
-                        player.money += PASS_GO_SALARY;
-                        logMessage(`${player.name} passed GO and collected £${PASS_GO_SALARY}.`);
-                        passedGoOnCardMove = true;
+                    if (card.collectGo && player.currentPosition < oldPos && oldPos !== player.currentPosition) { 
+                        player.money += PASS_GO_SALARY; passedGoOnCardMove = true;
+                        logMessage(`${player.name} passed GO by card and collected £${PASS_GO_SALARY}.`);
+                    } else if (card.collectGo && card.value === GO_POSITION && oldPos !== GO_POSITION) { // Specifically "Advance to Go"
+                        player.money += PASS_GO_SALARY; passedGoOnCardMove = true;
+                        logMessage(`${player.name} advanced to GO by card and collected £${PASS_GO_SALARY}.`);
                     }
                     placeTokenOnBoard(player);
                     logMessage(`${player.name} moved to ${boardData[player.currentPosition].name}.`);
-                    // Important: After moving, player might land on another action space (e.g. property, tax)
-                    // This requires a "chained" action. For now, we'll simplify: if it's an ownable space, trigger that logic.
-                    // Otherwise, the turn ends. This can be expanded for full recursive actions.
-                    const newLandedSpace = boardData[player.currentPosition];
-                    if (['property', 'station', 'utility'].includes(newLandedSpace.type)) {
-                        handleOwnableSpace(player, newLandedSpace); // This will call endTurnActions
-                        return; // Prevent double endTurnActions
-                    } else if (newLandedSpace.type === 'tax') {
-                        payTax(player, newLandedSpace);
-                        return;
-                    } // Other types like GO, Jail (visiting) don't need immediate re-triggering from a card move.
+                    actionLeadsToNewSpace = true; newSpaceToHandle = boardData[player.currentPosition];
                     break;
-                case 'moveToNearest': // station or utility
-                    let nearestPosition = -1;
-                    let currentMinDistance = TOTAL_SPACES;
-                    const originalPos = player.currentPosition;
-
-                    for (let i = 0; i < TOTAL_SPACES; i++) {
-                        const checkPos = (originalPos + i) % TOTAL_SPACES; // Search forward
-                        if (boardData[checkPos].type === card.value) { // card.value is 'station' or 'utility'
-                            const distance = i;
-                            if (distance < currentMinDistance) {
-                                // This logic is a bit flawed for "nearest" if it means purely numerically closest.
-                                // Monopoly usually means "next one on the board".
-                                nearestPosition = checkPos;
-                                break; // Found the next one
-                            }
-                        }
+                case 'moveToNearest': 
+                    let nearestPosition = -1; const originalPos = player.currentPosition;
+                    for (let i = 1; i <= TOTAL_SPACES; i++) { // Check all spaces starting from next
+                        const checkPos = (originalPos + i) % TOTAL_SPACES;
+                        if (boardData[checkPos].type === card.value) { nearestPosition = checkPos; break; }
                     }
                     if (nearestPosition !== -1) {
                         const oldP = player.currentPosition;
                         player.currentPosition = nearestPosition;
-                        if (player.currentPosition < oldP) { // Passed GO
-                             player.money += PASS_GO_SALARY;
-                             logMessage(`${player.name} passed GO and collected £${PASS_GO_SALARY}.`);
-                             passedGoOnCardMove = true;
-                        }
+                        if (player.currentPosition < oldP) { player.money += PASS_GO_SALARY; passedGoOnCardMove = true; logMessage(`${player.name} passed GO and collected £${PASS_GO_SALARY}.`); }
                         placeTokenOnBoard(player);
                         logMessage(`${player.name} moved to nearest ${card.value}: ${boardData[player.currentPosition].name}.`);
-                        const landedSpaceData = boardData[player.currentPosition];
-                        
-                        if (landedSpaceData.ownerId === null) { // Unowned
-                            showModal(`Landed on ${landedSpaceData.name}`, `This ${card.value} is unowned. Buy for £${landedSpaceData.price}?`, [
-                                { text: "Buy", action: () => { tryBuyProperty(player, landedSpaceData); /* endTurnActions is called by tryBuyProperty */ } },
-                                { text: "Pass", action: () => { logMessage(`${player.name} passed on buying.`); endTurnActions(); } }
-                            ]);
-                            return; // Modal handles next step
-                        } else if (landedSpaceData.ownerId !== player.id) { // Owned by another
-                            const owner = players[landedSpaceData.ownerId];
-                            let rentToPay = 0;
-                            if (card.subType === "payDoubleRentOrBuy" && landedSpaceData.type === "station") {
-                                const stationsOwnedByOwner = owner.propertiesOwned.filter(id => boardData.find(s => s.id === id && s.type === 'station')).length;
-                                rentToPay = (landedSpaceData.rent[stationsOwnedByOwner -1] || 25) * 2;
-                                logMessage(`Paying double rent for station: £${rentToPay}`);
-                            } else if (card.subType === "payDiceRollRentOrBuy" && landedSpaceData.type === "utility") {
-                                const utilityDiceRoll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1; // Fresh roll for utility
-                                logMessage(`${player.name} rolled ${utilityDiceRoll} for utility rent.`);
-                                rentToPay = utilityDiceRoll * 10;
-                                logMessage(`Paying 10x dice roll for utility: £${rentToPay}`);
+                        actionLeadsToNewSpace = true; newSpaceToHandle = boardData[player.currentPosition];
+                        // Special rent logic for these will be handled by handleOwnableSpace if it's ownable
+                        // For now, the move itself happens. Subsequent actions based on space type.
+                        if (newSpaceToHandle.ownerId !== null && newSpaceToHandle.ownerId !== player.id) {
+                            if (card.subType === "payDoubleRentOrBuy" && newSpaceToHandle.type === "station") {
+                                logMessage("Rent will be doubled for this station."); // Rent logic in handleOwnableSpace
+                            } else if (card.subType === "payDiceRollRentOrBuy" && newSpaceToHandle.type === "utility") {
+                                logMessage("Rent will be 10x dice roll for this utility."); // Rent logic in handleOwnableSpace
                             }
-                            payRent(player, owner, rentToPay); // payRent calls endTurnActions
-                            return; // Modal handles next step
-                        } else { // Owns it
-                             logMessage(`${player.name} landed on their own ${card.value}.`);
                         }
                     }
                     break;
-                case 'collectMoney':
-                    player.money += card.value;
-                    logMessage(`${player.name} collected £${card.value}.`);
-                    break;
-                case 'payMoney':
-                    player.money -= card.value; // Bankruptcy not handled here yet
-                    logMessage(`${player.name} paid £${card.value}.`);
-                    break;
-                case 'getOutOfJailFree':
-                    player.getOutOfJailFreeCards++;
-                    logMessage(`${player.name} received a "Get Out of Jail Free" card.`);
-                    break;
-                case 'goToJail':
-                    goToJail(player); // This function calls endTurnActions via its modal
-                    return; // goToJail handles the turn end
+                case 'collectMoney': player.money += card.value; logMessage(`${player.name} collected £${card.value}.`); break;
+                case 'payMoney': player.money -= card.value; logMessage(`${player.name} paid £${card.value}.`); break; // Check bankruptcy later
+                case 'getOutOfJailFree': player.getOutOfJailFreeCards++; logMessage(`${player.name} received a "Get Out of Jail Free" card.`); break;
+                case 'goToJail': goToJail(player, true); return; // goToJail now handles modal & endTurnActions
                 case 'moveSpaces':
                     const prevPos = player.currentPosition;
-                    player.currentPosition = (player.currentPosition + card.value + TOTAL_SPACES) % TOTAL_SPACES; // Ensure positive result
-                     // No GO collection for "Go Back 3 Spaces" usually
+                    player.currentPosition = (player.currentPosition + card.value + TOTAL_SPACES) % TOTAL_SPACES;
                     placeTokenOnBoard(player);
                     logMessage(`${player.name} moved ${card.value} spaces to ${boardData[player.currentPosition].name}.`);
-                    // Handle landing on the new space after moving back
-                    const spaceAfterMoveBack = boardData[player.currentPosition];
-                     if (['property', 'station', 'utility'].includes(spaceAfterMoveBack.type)) {
-                        handleOwnableSpace(player, spaceAfterMoveBack); 
-                        return; 
-                    } else if (spaceAfterMoveBack.type === 'tax') {
-                        payTax(player, spaceAfterMoveBack);
-                        return;
-                    } else if (spaceAfterMoveBack.type === 'chance' || spaceAfterMoveBack.type === 'community-chest') {
-                        // Avoid infinite card loop by just ending turn if moved to another card space by a card
-                        logMessage(`Landed on another card space due to a card. Turn ends.`);
-                    }
+                    actionLeadsToNewSpace = true; newSpaceToHandle = boardData[player.currentPosition];
                     break;
                 case 'streetRepairs':
-                    // Simplified: flat fee per property owned for now, as houses aren't implemented
-                    let totalRepairCost = 0;
+                    let totalRepairCost = 0; // Simplified: flat fee per property
                     player.propertiesOwned.forEach(propId => {
                         const propData = boardData.find(s => s.id === propId);
-                        if (propData && propData.type === 'property') { // Only actual properties, not stations/utilities
-                             // When houses are implemented, use card.houseCost and card.hotelCost
-                             // For now, a flat fee per property as a placeholder for repair costs
-                            totalRepairCost += 10; // Placeholder: £10 per property
-                        }
+                        if (propData && propData.type === 'property') { totalRepairCost += (propData.houses === 5 ? card.hotelCost : propData.houses * card.houseCost) || 10; }
                     });
-                    if (totalRepairCost > 0) {
-                        player.money -= totalRepairCost;
-                        logMessage(`${player.name} paid £${totalRepairCost} for street repairs (simplified).`);
-                    } else {
-                        logMessage(`${player.name} has no properties, so no street repair costs.`);
-                    }
+                    if (totalRepairCost > 0) { player.money -= totalRepairCost; logMessage(`${player.name} paid £${totalRepairCost} for street repairs.`); }
+                    else { logMessage(`${player.name} has no developed properties for street repairs.`);}
                     break;
                 case 'payEachPlayer':
-                    players.forEach(p => {
-                        if (p.id !== player.id) {
-                            player.money -= card.value;
-                            p.money += card.value;
-                            logMessage(`${player.name} paid £${card.value} to ${p.name}.`);
-                        }
-                    });
+                    players.forEach(p => { if (p.id !== player.id) { player.money -= card.value; p.money += card.value; updatePlayerInfoDisplay(p); } });
+                    logMessage(`${player.name} paid each player £${card.value}.`);
                     break;
                 case 'collectFromPlayers':
-                     players.forEach(p => {
-                        if (p.id !== player.id) {
-                            p.money -= card.value; // Other players pay
-                            player.money += card.value; // Current player collects
-                            logMessage(`${p.name} paid £${card.value} to ${player.name}.`);
-                            updatePlayerInfoDisplay(p); // Update other players' money display
-                        }
-                    });
+                     players.forEach(p => { if (p.id !== player.id) { p.money -= card.value; player.money += card.value; updatePlayerInfoDisplay(p); } });
+                     logMessage(`${player.name} collected £${card.value} from each player.`);
                     break;
             }
-            updateAllPlayerInfoDisplays(); // Update all displays after card effects
-            if (!passedGoOnCardMove && card.type === 'moveTo' && player.currentPosition === GO_POSITION) {
-                // If card moved player TO GO, but not PAST GO (e.g. "Advance to Go")
-                // Standard GO landing collection might be desired if not already handled by card.collectGo
-                // This is a bit tricky; usually "Advance to Go" implies collection.
-                // For now, assume card.collectGo handles it.
+            updateAllPlayerInfoDisplays();
+            
+            if(actionLeadsToNewSpace && newSpaceToHandle) {
+                // If card moved player, handle landing on new space recursively (but prevent infinite loops for card spaces)
+                if (newSpaceToHandle.type === 'chance' || newSpaceToHandle.type === 'community-chest') {
+                    logMessage(`Landed on ${newSpaceToHandle.name} due to a card. No further card draw this turn.`);
+                    endTurnActions();
+                } else {
+                    handleLandingOnSpace(player); // This will call endTurnActions
+                }
+            } else {
+                endTurnActions(); // Default end turn if no further chained action
             }
-            endTurnActions(); // End turn after card effect applied
         }
 
-
-        // --- Property, Tax, Jail Functions (largely same, but ensure they call endTurnActions or manage flow) ---
-        function handleOwnableSpace(player, space) { /* ... same as before ... */ 
+        function handleOwnableSpace(player, space) { /* ... same, but ensure endTurnActions is called from modal callbacks ... */ 
             if (space.ownerId === null) { 
                 const buyCost = space.price;
-                showModal(
-                    `For Sale: ${space.name}`,
-                    `This property is unowned. Would you like to buy it for £${buyCost}? <br>Your money: £${player.money}`,
+                showModal( `For Sale: ${space.name}`, `This property is unowned. Would you like to buy it for £${buyCost}? <br>Your money: £${player.money}`,
                     [
-                        { text: `Buy (£${buyCost})`, action: () => tryBuyProperty(player, space), class: player.money >= buyCost ? '' : 'bg-gray-400 cursor-not-allowed' },
+                        { text: `Buy (£${buyCost})`, action: () => { tryBuyProperty(player, space); }, disabled: player.money < buyCost },
                         { text: "Pass", action: () => { logMessage(`${player.name} decided not to buy ${space.name}.`); endTurnActions(); }, class: 'secondary' }
                     ]
                 );
             } else if (space.ownerId !== player.id) { 
                 const owner = players[space.ownerId];
                 let rentAmount = 0;
-                if (space.type === 'property') rentAmount = space.rent[space.houses || 0]; // Use houses count for rent
-                else if (space.type === 'station') {
-                    const stationsOwned = owner.propertiesOwned.filter(pId => boardData.find(s => s.id === pId && s.type === 'station')).length;
-                    rentAmount = space.rent[stationsOwned - 1] || 25;
-                } else if (space.type === 'utility') {
-                    const utilitiesOwned = owner.propertiesOwned.filter(pId => boardData.find(s => s.id === pId && s.type === 'utility')).length;
-                    const lastRoll = dice[0] + dice[1]; // Use current turn's dice roll
-                    rentAmount = utilitiesOwned === 1 ? lastRoll * 4 : lastRoll * 10;
-                }
-
-                if (rentAmount > 0) {
-                     showModal( "Rent Due!", `This property is owned by ${owner.name}. You owe £${rentAmount} in rent.`,
-                        [{ text: `Pay £${rentAmount}`, action: () => payRent(player, owner, rentAmount) }]
-                    );
-                } else {
-                     logMessage(`${space.name} is owned by ${owner.name}, but no rent due.`);
-                     endTurnActions();
-                }
-            } else { 
-                logMessage(`${player.name} landed on their own property: ${space.name}.`);
-                endTurnActions();
-            }
+                if (space.type === 'property') rentAmount = space.rent[space.houses || 0]; 
+                else if (space.type === 'station') { const stationsOwned = owner.propertiesOwned.filter(pId => boardData.find(s => s.id === pId && s.type === 'station')).length; rentAmount = space.rent[stationsOwned - 1] || 25; } 
+                else if (space.type === 'utility') { const utilitiesOwned = owner.propertiesOwned.filter(pId => boardData.find(s => s.id === pId && s.type === 'utility')).length; const lastRoll = dice[0] + dice[1]; rentAmount = utilitiesOwned === 1 ? lastRoll * 4 : lastRoll * 10; }
+                if (rentAmount > 0) { showModal( "Rent Due!", `This property is owned by ${owner.name}. You owe £${rentAmount} in rent.`, [{ text: `Pay £${rentAmount}`, action: () => payRent(player, owner, rentAmount) }] ); } 
+                else { logMessage(`${space.name} is owned by ${owner.name}, but no rent due.`); endTurnActions(); }
+            } else { logMessage(`${player.name} landed on their own property: ${space.name}.`); endTurnActions(); }
         }
-        function tryBuyProperty(player, space) { /* ... same as before ... */ 
+        function tryBuyProperty(player, space) { /* ... same, calls endTurnActions ... */ 
             const cost = space.price;
-            if (player.money >= cost) {
-                player.money -= cost;
-                space.ownerId = player.id;
-                player.propertiesOwned.push(space.id); 
-                logMessage(`${player.name} bought ${space.name} for £${cost}.`);
-                updatePlayerInfoDisplay(player);
-                updateOwnerMarker(boardData.indexOf(space));
-            } else {
-                logMessage(`${player.name} does not have enough money to buy ${space.name}.`);
-            }
+            if (player.money >= cost) { player.money -= cost; space.ownerId = player.id; player.propertiesOwned.push(space.id); logMessage(`${player.name} bought ${space.name} for £${cost}.`); updatePlayerInfoDisplay(player); updateOwnerMarker(boardData.indexOf(space)); } 
+            else { logMessage(`${player.name} does not have enough money to buy ${space.name}.`); }
             endTurnActions();
         }
-        function payRent(payer, owner, amount) { /* ... same as before ... */ 
-             if (payer.money >= amount) {
-                payer.money -= amount;
-                owner.money += amount;
-                logMessage(`${payer.name} paid £${amount} rent to ${owner.name}.`);
-            } else { 
-                const amountPaid = payer.money;
-                owner.money += amountPaid;
-                payer.money = 0;
-                logMessage(`${payer.name} could only pay £${amountPaid} of £${amount} rent to ${owner.name}. ${payer.name} is bankrupt! (Bankruptcy logic TBD)`);
-            }
-            updatePlayerInfoDisplay(payer);
-            updatePlayerInfoDisplay(owner);
-            endTurnActions();
+        function payRent(payer, owner, amount) { /* ... same, calls endTurnActions ... */ 
+             if (payer.money >= amount) { payer.money -= amount; owner.money += amount; logMessage(`${payer.name} paid £${amount} rent to ${owner.name}.`); } 
+             else { const amountPaid = payer.money; owner.money += amountPaid; payer.money = 0; logMessage(`${payer.name} could only pay £${amountPaid} of £${amount} rent to ${owner.name}. ${payer.name} is bankrupt! (Bankruptcy logic TBD)`); }
+            updatePlayerInfoDisplay(payer); updatePlayerInfoDisplay(owner); endTurnActions();
         }
-        function payTax(player, space) { /* ... same as before ... */ 
-            const taxAmount = space.amount;
-            player.money -= taxAmount;
-            logMessage(`${player.name} paid £${taxAmount} for ${space.name}.`);
-            updatePlayerInfoDisplay(player);
-            showModal( space.name, `You landed on ${space.name}. <br>Pay £${taxAmount}.`,
-                [{ text: "OK", action: endTurnActions }]
-            );
+        function payTax(player, space) { /* ... same, calls endTurnActions from modal ... */ 
+            const taxAmount = space.amount; player.money -= taxAmount; logMessage(`${player.name} paid £${taxAmount} for ${space.name}.`); updatePlayerInfoDisplay(player);
+            showModal( space.name, `You landed on ${space.name}. <br>Pay £${taxAmount}.`, [{ text: "OK", action: endTurnActions }] );
         }
-        function goToJail(player, fromCard = false) {
-            player.currentPosition = JAIL_POSITION;
-            player.inJail = true;
-            player.jailTurns = 0;
-            placeTokenOnBoard(player);
-            updatePlayerInfoDisplay(player);
+        function goToJail(player, fromCard = false) { /* ... same ... */ 
+            player.currentPosition = JAIL_POSITION; player.inJail = true; player.jailTurnsAttempted = 0; // Reset attempts when sent to jail
+            placeTokenOnBoard(player); updatePlayerInfoDisplay(player);
             logMessage(`${player.name} was sent to Jail!`);
             showModal("🚓 Go To Jail! 🚓", "Oh no! You've been caught and sent directly to Jail. Do not pass Go, do not collect £200.",
-                [{ text: "Bummer!", action: endTurnActions }] // endTurnActions will handle if it's still their turn (e.g. not doubles)
+                [{ text: "Bummer!", action: endTurnActions }] 
             );
         }
-        function handleJailTurn(player) {
-            player.jailTurns++;
-            const options = [
-                { text: `Pay £50 Fine`, action: () => {
-                    if (player.money >= 50) {
-                        player.money -= 50;
-                        player.inJail = false;
-                        logMessage(`${player.name} paid £50 to get out of jail.`);
-                        updatePlayerInfoDisplay(player);
-                        rollDiceButton.disabled = false; // Allow to roll immediately after paying
-                    } else {
-                        logMessage(`${player.name} doesn't have £50 to pay the fine.`);
-                        // Re-show modal or force other options if money is insufficient
-                        handleJailTurn(player); // Simple re-prompt for now
-                    }
-                }}
-            ];
-            if (player.getOutOfJailFreeCards > 0) {
-                options.push({ text: "Use Get Out of Jail Free Card", action: () => {
-                    player.getOutOfJailFreeCards--;
-                    player.inJail = false;
-                    logMessage(`${player.name} used a Get Out of Jail Free card.`);
-                    updatePlayerInfoDisplay(player);
-                    rollDiceButton.disabled = false; // Allow to roll immediately
-                }});
-            }
-            options.push({ text: "Try to Roll Doubles", action: () => {
-                const d1 = Math.floor(Math.random() * 6) + 1;
-                const d2 = Math.floor(Math.random() * 6) + 1;
-                dice1Display.textContent = d1;
-                dice2Display.textContent = d2;
-                diceTotalDisplay.textContent = d1 + d2;
-                logMessage(`${player.name} (in jail) rolled ${d1} and ${d2}.`);
-                if (d1 === d2) {
-                    player.inJail = false;
-                    logMessage("Doubles! You're out of jail. Move according to roll.");
-                    // Move player by d1+d2, then normal landing logic
-                    player.currentPosition = (player.currentPosition + d1 + d2) % TOTAL_SPACES; // Should be from JAIL_POSITION
-                    placeTokenOnBoard(player);
-                    updatePlayerInfoDisplay(player);
-                    logMessage(`${player.name} landed on ${boardData[player.currentPosition].name.split('<br>')[0]}.`);
-                    handleLandingOnSpace(player); // This will call endTurnActions
-                } else {
-                    logMessage("No doubles. Still in jail.");
-                    if (player.jailTurns >= 3) {
-                        logMessage("Third attempt failed. Must pay £50 fine or use card if available.");
-                        // Force pay or use card if possible, otherwise stay in jail (or bankruptcy if no money/card)
-                        // Simplified: For now, just end turn if 3 turns passed and no doubles
-                        endTurnActions();
-                    } else {
-                       endTurnActions(); // End turn if not doubles and not 3rd turn
-                    }
-                }
-            }});
-
-            showModal(
-                "In Jail!",
-                `${player.name}, you are in Jail (Turn ${player.jailTurns} of 3). Choose an option:`,
-                options
-            );
-        }
-
 
         // --- Turn Progression ---
         function endTurnActions() {
             const currentPlayer = players[currentPlayerIndex];
-            if (dice[0] === dice[1] && !currentPlayer.inJail && rollDiceButton.disabled) { // Check if button is disabled to prevent re-triggering on first roll of doubles
-                 logMessage(`${currentPlayer.name} rolled doubles! Roll again.`);
-                 rollDiceButton.disabled = false; 
+            // Only allow "roll again" for doubles if it wasn't a roll to get out of jail,
+            // and if the player is NOT currently in jail (meaning, they took a normal turn or got out successfully before this)
+            // and if the rollDiceButton is disabled (meaning a roll just processed)
+            if (dice[0] === dice[1] && !currentPlayer.inJail && !rolledDoublesToGetOutOfJailThisAction && rollDiceButton.disabled) {
+                logMessage(`${currentPlayer.name} rolled doubles! Roll again.`);
+                rollDiceButton.disabled = false; // Allow current player to roll again
+                // Do not switch turn
             } else {
-                // If player was in jail and got out by paying/card, their turn might continue with a roll
-                // If they got out by rolling doubles, their move is done, so switch turn
-                if (currentPlayer.inJail) { // Still in jail after trying to get out
-                     setTimeout(() => { switchTurn(); rollDiceButton.disabled = false; }, 300);
-                } else if (!rollDiceButton.disabled) { // If button is enabled, it means they can roll (e.g. got out of jail by paying)
-                    // Don't switch turn yet, let them roll.
-                }
-                 else { // Normal turn end or got out of jail by rolling doubles.
-                    setTimeout(() => { switchTurn(); rollDiceButton.disabled = false; }, 300);
+                // Normal turn end, or turn ends after a jail sequence.
+                // If rollDiceButton is enabled, it means they got out by paying/card and are ABOUT to roll for their turn. So don't switch yet.
+                if (!rollDiceButton.disabled && !currentPlayer.inJail) {
+                    // This case means they paid/used card to get out of jail, rollDiceButton is enabled.
+                    // Their next action is to click it. So, do nothing here, let them click.
+                } else {
+                    // All other cases: switch turn.
+                    setTimeout(() => { 
+                        switchTurn(); 
+                        rollDiceButton.disabled = false; // Enable for next player
+                    }, 300);
                 }
             }
+            rolledDoublesToGetOutOfJailThisAction = false; // Reset flag for the next turn/action
         }
 
-        function switchTurn() { /* ... same as before ... */ 
+        function switchTurn() { /* ... same ... */ 
             currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
             updateCurrentPlayerDisplay();
             logMessage(`${players[currentPlayerIndex].name}'s (${players[currentPlayerIndex].tokenRepresentation}) turn.`);
             updateAllPlayerInfoDisplays();
         }
-        function updateCurrentPlayerDisplay() { /* ... same as before ... */ 
+        function updateCurrentPlayerDisplay() { /* ... same ... */ 
             if (players.length > 0) {
                 currentPlayerNameDisplay.textContent = `${players[currentPlayerIndex].name} (${players[currentPlayerIndex].tokenRepresentation})`;
             }
         }
-        function logMessage(message) { /* ... same as before ... */ 
+        function logMessage(message) { /* ... same ... */ 
             const previousMessage = messageLog.innerHTML;
             messageLog.innerHTML = message + (previousMessage ? '<br>' + previousMessage.split('<br>').slice(0, 9).join('<br>') : '');
         }
 
         // --- Event Listeners & Initialization ---
         rollDiceButton.addEventListener('click', handlePlayerTurn);
-        window.onload = () => {
+        window.onload = () => { /* ... same DOM setup ... */ 
             document.querySelectorAll('.board .space').forEach(spaceEl => {
                 if (!spaceEl.querySelector('.content')) { const contentWrapper = document.createElement('div'); contentWrapper.classList.add('content'); while (spaceEl.firstChild) { contentWrapper.appendChild(spaceEl.firstChild); } spaceEl.appendChild(contentWrapper); }
                 if (!spaceEl.querySelector('.token-container')) { const tokenContainer = document.createElement('div'); tokenContainer.classList.add('token-container'); spaceEl.appendChild(tokenContainer); }
