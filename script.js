@@ -7,6 +7,9 @@ const PLAYER_UI_COLORS = ['#FF0000', '#0000FF', '#00AA00', '#FF8C00', '#800080',
 const JAIL_POSITION = 10; // Index of Jail space on the board
 const JAIL_FINE = 50; // Cost to get out of jail by paying
 const MAX_JAIL_ROLL_ATTEMPTS = 3; // Max attempts to roll doubles to get out of jail
+const MAX_HOUSES = 4; 
+const HOTEL_LEVEL = 5; 
+
 
 // Board position constants for cards
 const GO_POSITION = 0;
