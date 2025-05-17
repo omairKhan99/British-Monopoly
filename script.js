@@ -37,6 +37,7 @@ let propertyManagementActionInProgress = false;
 // --- DOM Elements ---
 // Getting references to HTML elements to interact with them
 const rollDiceButton = document.getElementById('rollDiceButton');
+const managePropertiesButton = document.getElementById('managePropertiesButton'); 
 const dice1Display = document.getElementById('dice1Display');
 const dice2Display = document.getElementById('dice2Display');
 const diceTotalDisplay = document.getElementById('diceTotalDisplay');
@@ -94,71 +95,24 @@ function initializeDecks() {
         { text: "You have won second prize in a beauty contest. Collect £10.", type: "collectMoney", value: 10 },
     ];
 
-    shuffleDeck(chanceCards);
-    shuffleDeck(communityChestCards);
-    updateCardPileDisplays(); // Update UI for card counts
+        shuffleDeck(chanceCards); shuffleDeck(communityChestCards); updateCardPileDisplays();
 }
-
-/**
- * Shuffles a given deck of cards using the Fisher-Yates algorithm.
- * @param {Array} deck - The array of card objects to shuffle.
- */
-function shuffleDeck(deck) {
-    for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]]; // Swap elements
-    }
-}
-
-/**
- * Draws the next card from the specified deck.
- * @param {string} deckType - Either 'chance' or 'community-chest'.
- * @returns {object} The drawn card object.
- */
-function drawCard(deckType) {
-    let card;
-    if (deckType === 'chance') {
-        card = chanceCards[chanceCardIndex];
-        chanceCardIndex = (chanceCardIndex + 1) % chanceCards.length; // Cycle through deck
-    } else { // community-chest
-        card = communityChestCards[communityChestCardIndex];
-        communityChestCardIndex = (communityChestCardIndex + 1) % communityChestCards.length; // Cycle
-    }
-    logMessage(`${players[currentPlayerIndex].name} drew a ${deckType} card: "${card.text}"`);
-    updateCardPileDisplays();
-    return card;
-}
-
-/**
- * Updates the display for the number of cards remaining in each pile.
- * (Currently shows total, not remaining, for simplicity as cards are recycled)
- */
-function updateCardPileDisplays() {
-    chanceCardPileDisplay.innerHTML = `CHANCE <br> (${chanceCards.length} cards)`;
-    communityChestCardPileDisplay.innerHTML = `COMMUNITY CHEST <br> (${communityChestCards.length} cards)`;
-}
+function shuffleDeck(deck) { for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; } }
+function drawCard(deckType) { let card; if (deckType === 'chance') { card = chanceCards[chanceCardIndex]; chanceCardIndex = (chanceCardIndex + 1) % chanceCards.length; 
+    
+} else { card = communityChestCards[communityChestCardIndex]; communityChestCardIndex = (communityChestCardIndex + 1) % communityChestCards.length; } logMessage(`${players[currentPlayerIndex].name} drew a ${deckType} card: "${card.text}"`); updateCardPileDisplays(); return card; }
+function updateCardPileDisplays() { chanceCardPileDisplay.innerHTML = `CHANCE <br> (${chanceCards.length} cards)`; communityChestCardPileDisplay.innerHTML = `COMMUNITY CHEST <br> (${communityChestCards.length} cards)`; }
 
 
-// --- Board Data Initialization ---
-/**
- * Sets up the `boardData` array with details for each space on the Monopoly board.
- * Includes name, type, price, rent, group, ownerId, etc.
- */
+// --- Board Data Initialization (Added 'houses: 0' to all properties) ---
 function initializeBoardData() {
     boardData = [
-        // Space 0: GO
         { id: 'space-0', name: "GO", type: "go", group: "corner" },
-        // Space 1: Old Kent Road
         { id: 'space-1', name: "Old Kent Road", type: "property", price: 60, rent: [2, 10, 30, 90, 160, 250], group: "brown", ownerId: null, houseCost: 50, houses: 0 },
-        // Space 2: Community Chest
         { id: 'space-2', name: "Community Chest", type: "community-chest", group: "event" },
-        // Space 3: Whitechapel Road
         { id: 'space-3', name: "Whitechapel Road", type: "property", price: 60, rent: [4, 20, 60, 180, 320, 450], group: "brown", ownerId: null, houseCost: 50, houses: 0 },
-        // Space 4: Income Tax
         { id: 'space-4', name: "Income Tax", type: "tax", amount: 200, group: "event" },
-        // Space 5: King's Cross Station
         { id: 'space-5', name: "King's Cross Station", type: "station", price: 200, rent: [25, 50, 100, 200], group: "station", ownerId: null },
-        // ... (Continue for all 40 spaces, data from previous JS block)
         { id: 'space-6', name: "The Angel, Islington", type: "property", price: 100, rent: [6, 30, 90, 270, 400, 550], group: "light-blue", ownerId: null, houseCost: 50, houses: 0 },
         { id: 'space-7', name: "Chance", type: "chance", group: "event" },
         { id: 'space-8', name: "Euston Road", type: "property", price: 100, rent: [6, 30, 90, 270, 400, 550], group: "light-blue", ownerId: null, houseCost: 50, houses: 0 },
@@ -194,19 +148,17 @@ function initializeBoardData() {
         { id: 'space-38', name: "Super Tax", type: "tax", amount: 100, group: "event" },
         { id: 'space-39', name: "Mayfair", type: "property", price: 400, rent: [50, 200, 600, 1400, 1700, 2000], group: "dark-blue", ownerId: null, houseCost: 200, houses: 0 }
     ];
-    // Ensure all ownable spaces have an ownerId and properties have a houses count
     boardData.forEach(space => {
         if (!('ownerId' in space) && (space.type === 'property' || space.type === 'station' || space.type === 'utility')) {
             space.ownerId = null;
         }
-        if (space.type === 'property' && !('houses' in space)) {
-            space.houses = 0; // 0 houses, 5 for hotel (to be implemented)
+        if (space.type === 'property' && !('houses' in space)) { 
+            space.houses = 0; 
         }
     });
 }
 
 
-// --- Modal Functions ---
 /**
  * Shows a modal dialog with a title, message, and configurable buttons.
  * @param {string} title - The title of the modal.
