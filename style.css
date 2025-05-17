@@ -1,122 +1,134 @@
 /* General Body and Game Container Styles */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #cce2d4; /* Light green, typical Monopoly background */
+    background-color: #cce2d4;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Align board to top */
+    justify-content: flex-start;
     min-height: 100vh;
     padding: 20px;
     margin: 0;
-    overflow-x: hidden; /* Prevent horizontal scroll if modal peeks */
+    overflow-x: hidden;
 }
 
 .game-container {
     display: flex;
-    flex-direction: column; /* Stack board and controls */
+    flex-direction: column;
     align-items: center;
-    gap: 20px; /* Space between board and controls */
+    gap: 20px;
 }
 
 /* Board Layout Styles */
 .board {
     display: grid;
-    /* Defines 11 columns: corners (100px), 9 properties (65px each) */
     grid-template-columns: 100px repeat(9, 65px) 100px;
-    /* Defines 11 rows: corners (100px), 9 properties (65px each) */
     grid-template-rows: 100px repeat(9, 65px) 100px;
-    gap: 2px; /* Thin lines between spaces */
+    gap: 2px;
     border: 3px solid black;
-    background-color: #f7f7f7; /* Board inner background */
-    width: 802px; /* (100*2 for corners + 65*9 for props + 2*10 for gaps) */
-    height: 802px; /* Same calculation for height */
-    position: relative; /* For positioning elements within the board later if needed */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Nice shadow effect */
+    background-color: #f7f7f7;
+    width: 802px;
+    height: 802px;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 /* Individual Space Styles */
 .space {
-    background-color: #f7f7f7; /* Default background for spaces */
-    border: 1px solid #333; /* Border for each space */
+    background-color: #f7f7f7;
+    border: 1px solid #333;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; /* Distribute space for content, tokens, owner marker */
+    justify-content: space-between;
     text-align: center;
-    font-size: 9px; /* Default font size for space text */
+    font-size: 9px;
     line-height: 1.2;
     position: relative;
-    padding: 1px; /* Minimal padding */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-    overflow: hidden; /* Prevent content spillover */
+    padding: 1px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .space .content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Center the main content of the space */
-    height: 70%; /* Allocate most space to content */
+    justify-content: center;
+    height: 65%; /* Adjusted to make space for house display */
     width: 100%;
 }
 
-.space .token-container {
+.house-hotel-display {
+    height: 10%; /* Space for house/hotel icons */
     width: 100%;
-    height: 25%; /* Allocate space for player tokens */
     display: flex;
-    flex-wrap: wrap; /* Allow tokens to wrap if many */
     align-items: center;
     justify-content: center;
-    gap: 2px; /* Space between tokens */
+    font-size: 12px; /* Adjust size of house/hotel emojis */
+    line-height: 1;
+    overflow: hidden; /* Prevent too many emojis from breaking layout */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.space .token-container {
+    width: 100%;
+    height: 20%; /* Adjusted */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
     padding: 1px;
 }
 
 .player-token {
-    width: 22px;  /* Size for emoji tokens */
-    height: 22px; /* Size for emoji tokens */
-    font-size: 18px; /* Emoji character size */
+    width: 22px;
+    height: 22px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0,0,0,0.2); /* Subtle border */
-    border-radius: 4px; /* Slightly rounded square for token */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3); /* Slight shadow for depth */
-    line-height: 1; /* Ensure emoji is vertically centered */
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    line-height: 1;
 }
 
 .owner-marker-container {
-    height: 5%; /* Small strip at the bottom for owner color */
+    height: 5%;
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: flex-end; /* Place marker at the bottom of its container */
+    align-items: flex-end;
 }
 
 .owner-marker {
-    width: 80%; /* Width of the color strip */
-    height: 5px; /* Height of the color strip */
-    border-top: 1px solid black; /* Optional: border for the marker */
-    background-color: transparent; /* Default, will be colored by JS */
+    width: 80%;
+    height: 5px;
+    border-top: 1px solid black;
+    background-color: transparent;
 }
 
 /* Corner Space Styles */
 .corner {
     font-weight: bold;
-    font-size: 14px; /* Larger font for corner titles */
+    font-size: 14px;
 }
-.corner .content { height: 80%; } /* More space for corner text */
+.corner .content { height: 80%; } /* Corners don't have house display usually */
 .corner .token-container { height: 20%; }
 
-/* Property Specific Styles (Color bar, Name, Price) */
+/* Property Specific Styles */
 .property .color-bar {
-    height: 15px; /* Height of the color strip on properties */
+    height: 15px;
     width: 100%;
-    border-bottom: 1px solid #333; /* Border below color bar */
-    margin-bottom: 1px; /* Small gap */
+    border-bottom: 1px solid #333;
+    margin-bottom: 1px;
 }
 .property .name {
-    flex-grow: 1; /* Allow name to take available space */
+    flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,103 +138,24 @@ body {
 }
 .property .price {
     font-weight: 600;
-    margin-top: 1px; /* Small gap */
+    margin-top: 1px;
 }
 
-/* Grid Position CSS (assigning spaces to grid cells) */
-/* These classes are added to the .space divs in HTML */
-.row-1 { grid-row: 1; }
-.row-11 { grid-row: 11; } /* Note: Grid rows are 1-indexed */
-.col-1 { grid-column: 1; }
-.col-11 { grid-column: 11; } /* Note: Grid columns are 1-indexed */
+/* Grid Position CSS (Identical to previous version) */
+.row-1 { grid-row: 1; } .row-11 { grid-row: 11; } .col-1 { grid-column: 1; } .col-11 { grid-column: 11; }
+.space-go { grid-column: 11; grid-row: 11; } .space-old-kent-road { grid-column: 10; grid-row: 11; } .space-community-chest-bottom { grid-column: 9; grid-row: 11; } .space-whitechapel-road { grid-column: 8; grid-row: 11; } .space-income-tax { grid-column: 7; grid-row: 11; } .space-kings-cross { grid-column: 6; grid-row: 11; } .space-the-angel-islington { grid-column: 5; grid-row: 11; } .space-chance-bottom { grid-column: 4; grid-row: 11; } .space-euston-road { grid-column: 3; grid-row: 11; } .space-pentonville-road { grid-column: 2; grid-row: 11; } .space-jail { grid-column: 1; grid-row: 11; }
+.space-pall-mall { grid-column: 1; grid-row: 10; } .space-electric-company { grid-column: 1; grid-row: 9; } .space-whitehall { grid-column: 1; grid-row: 8; } .space-northumberland-avenue { grid-column: 1; grid-row: 7; } .space-marylebone-station { grid-column: 1; grid-row: 6; } .space-bow-street { grid-column: 1; grid-row: 5; } .space-community-chest-left { grid-column: 1; grid-row: 4; } .space-marlborough-street { grid-column: 1; grid-row: 3; } .space-vine-street { grid-column: 1; grid-row: 2; }
+.space-free-parking { grid-column: 1; grid-row: 1; } .space-strand { grid-column: 2; grid-row: 1; } .space-chance-top { grid-column: 3; grid-row: 1; } .space-fleet-street { grid-column: 4; grid-row: 1; } .space-trafalgar-square { grid-column: 5; grid-row: 1; } .space-fenchurch-st-station { grid-column: 6; grid-row: 1; } .space-leicester-square { grid-column: 7; grid-row: 1; } .space-coventry-street { grid-column: 8; grid-row: 1; } .space-water-works { grid-column: 9; grid-row: 1; } .space-piccadilly { grid-column: 10; grid-row: 1; } .space-go-to-jail { grid-column: 11; grid-row: 1; }
+.space-regent-street { grid-column: 11; grid-row: 2; } .space-oxford-street { grid-column: 11; grid-row: 3; } .space-community-chest-right { grid-column: 11; grid-row: 4; } .space-bond-street { grid-column: 11; grid-row: 5; } .space-liverpool-st-station { grid-column: 11; grid-row: 6; } .space-chance-right { grid-column: 11; grid-row: 7; } .space-park-lane { grid-column: 11; grid-row: 8; } .space-super-tax { grid-column: 11; grid-row: 9; } .space-mayfair { grid-column: 11; grid-row: 10; }
 
-/* Bottom Row (Spaces 0-10, GO is 0, Jail is 10) */
-/* HTML order is reversed for grid-column to make it visually left-to-right */
-.space-go                          { grid-column: 11; grid-row: 11; }
-.space-old-kent-road             { grid-column: 10; grid-row: 11; }
-.space-community-chest-bottom    { grid-column: 9; grid-row: 11; }
-.space-whitechapel-road          { grid-column: 8; grid-row: 11; }
-.space-income-tax                { grid-column: 7; grid-row: 11; }
-.space-kings-cross               { grid-column: 6; grid-row: 11; }
-.space-the-angel-islington       { grid-column: 5; grid-row: 11; }
-.space-chance-bottom             { grid-column: 4; grid-row: 11; }
-.space-euston-road               { grid-column: 3; grid-row: 11; }
-.space-pentonville-road          { grid-column: 2; grid-row: 11; }
-.space-jail                        { grid-column: 1; grid-row: 11; }
+/* Text Rotation Styles (Identical to previous version) */
+.left-col .content .name, .right-col .content .name, .left-col .content .price, .right-col .content .price, .left-col.space .content > div:not(.color-bar):not(.name):not(.price):not(.station-icon):not(.utility-icon):not(.tax-icon):not(.chance-icon):not(.community-chest-icon), .right-col.space .content > div:not(.color-bar):not(.name):not(.price):not(.station-icon):not(.utility-icon):not(.tax-icon):not(.chance-icon):not(.community-chest-icon) { font-size: 7.5px; line-height: 1.1; }
+.left-col .content .name, .right-col .content .name { text-align: center; white-space: normal; width: 22px; margin: 1px 0; }
+.left-col.space .content { transform: rotate(90deg); } .right-col.space .content { transform: rotate(-90deg); } .top-row.space .content { transform: rotate(180deg); }
+.left-col.space .content .station-icon, .left-col.space .content .utility-icon, .left-col.space .content .tax-icon, .left-col.space .content .chance-icon, .left-col.space .content .community-chest-icon, .right-col.space .content .station-icon, .right-col.space .content .utility-icon, .right-col.space .content .tax-icon, .right-col.space .content .chance-icon, .right-col.space .content .community-chest-icon, .top-row.space .content .station-icon, .top-row.space .content .utility-icon, .top-row.space .content .tax-icon, .top-row.space .content .chance-icon, .top-row.space .content .community-chest-icon { transform: rotate(0deg) !important; }
+.left-col .content .price, .right-col .content .price, .top-row .content .price { transform: none !important; }
 
-/* Left Column (Spaces 11-19) */
-/* HTML order is reversed for grid-row to make it visually top-to-bottom */
-.space-pall-mall                 { grid-column: 1; grid-row: 10; }
-.space-electric-company          { grid-column: 1; grid-row: 9; }
-.space-whitehall                 { grid-column: 1; grid-row: 8; }
-.space-northumberland-avenue     { grid-column: 1; grid-row: 7; }
-.space-marylebone-station        { grid-column: 1; grid-row: 6; }
-.space-bow-street                { grid-column: 1; grid-row: 5; }
-.space-community-chest-left    { grid-column: 1; grid-row: 4; }
-.space-marlborough-street        { grid-column: 1; grid-row: 3; }
-.space-vine-street               { grid-column: 1; grid-row: 2; }
-
-/* Top Row (Spaces 20-30, Free Parking is 20, Go To Jail is 30) */
-.space-free-parking              { grid-column: 1; grid-row: 1; } /* This is the top-left corner */
-.space-strand                    { grid-column: 2; grid-row: 1; }
-.space-chance-top                { grid-column: 3; grid-row: 1; }
-.space-fleet-street              { grid-column: 4; grid-row: 1; }
-.space-trafalgar-square          { grid-column: 5; grid-row: 1; }
-.space-fenchurch-st-station      { grid-column: 6; grid-row: 1; }
-.space-leicester-square          { grid-column: 7; grid-row: 1; }
-.space-coventry-street           { grid-column: 8; grid-row: 1; }
-.space-water-works               { grid-column: 9; grid-row: 1; }
-.space-piccadilly                { grid-column: 10; grid-row: 1; }
-.space-go-to-jail                { grid-column: 11; grid-row: 1; } /* This is the top-right corner */
-
-/* Right Column (Spaces 31-39) */
-.space-regent-street             { grid-column: 11; grid-row: 2; }
-.space-oxford-street             { grid-column: 11; grid-row: 3; }
-.space-community-chest-right   { grid-column: 11; grid-row: 4; }
-.space-bond-street               { grid-column: 11; grid-row: 5; }
-.space-liverpool-st-station      { grid-column: 11; grid-row: 6; }
-.space-chance-right              { grid-column: 11; grid-row: 7; }
-.space-park-lane                 { grid-column: 11; grid-row: 8; }
-.space-super-tax                 { grid-column: 11; grid-row: 9; }
-.space-mayfair                   { grid-column: 11; grid-row: 10; }
-
-
-/* Text Rotation for Side and Top Properties */
-.left-col .content .name, .right-col .content .name,
-.left-col .content .price, .right-col .content .price,
-.left-col.space .content > div:not(.color-bar):not(.name):not(.price):not(.station-icon):not(.utility-icon):not(.tax-icon):not(.chance-icon):not(.community-chest-icon), /* Target general text divs */
-.right-col.space .content > div:not(.color-bar):not(.name):not(.price):not(.station-icon):not(.utility-icon):not(.tax-icon):not(.chance-icon):not(.community-chest-icon) {
-    font-size: 7.5px; /* Smaller font for rotated text */
-    line-height: 1.1;
-}
-
-.left-col .content .name, .right-col .content .name {
-    text-align: center;
-    white-space: normal; /* Allow <br> tags to work */
-    width: 22px; /* Unrotated width: becomes thickness of text band */
-    margin: 1px 0; /* Small vertical margin */
-}
-
-/* Rotate text within .content for left column properties/special spaces */
-.left-col.space .content { transform: rotate(90deg); }
-/* Rotate text within .content for right column properties/special spaces */
-.right-col.space .content { transform: rotate(-90deg); }
-/* Rotate text within .content for top row properties/special spaces */
-.top-row.space .content { transform: rotate(180deg); }
-
-/* Counter-rotate icons within rotated content so they appear upright */
-.left-col.space .content .station-icon, .left-col.space .content .utility-icon, .left-col.space .content .tax-icon, .left-col.space .content .chance-icon, .left-col.space .content .community-chest-icon,
-.right-col.space .content .station-icon, .right-col.space .content .utility-icon, .right-col.space .content .tax-icon, .right-col.space .content .chance-icon, .right-col.space .content .community-chest-icon,
-.top-row.space .content .station-icon, .top-row.space .content .utility-icon, .top-row.space .content .tax-icon, .top-row.space .content .chance-icon, .top-row.space .content .community-chest-icon {
-    transform: rotate(0deg) !important; /* Override parent rotation */
-}
-/* Ensure price is not doubly rotated if .content is rotated */
-.left-col .content .price, .right-col .content .price, .top-row .content .price {
-    transform: none !important;
-}
-
-
-/* Corner Specific Text/Icon Adjustments */
+/* Corner Specific Text/Icon Adjustments (Identical to previous version) */
 .space-jail .just { position: absolute; top: 15px; left: 5px; transform: rotate(45deg); font-size: 10px;}
 .space-jail .visiting { position: absolute; bottom: 15px; right: 5px; transform: rotate(45deg); font-size: 10px;}
 .space-jail .jail-icon-container { font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;}
@@ -230,216 +163,40 @@ body {
 .space-go-to-jail .go-to-jail-icon-container { font-size: 30px; }
 .space-go .arrow { font-size: 30px; color: #d60000; line-height: 1; }
 
+/* Center Area of the Board (Identical to previous version) */
+.center-area { grid-column: 2 / span 9; grid-row: 2 / span 9; background-color: #ddebe0; display: flex; flex-direction: column; align-items: center; justify-content: space-around; border: 2px solid black; padding: 20px; }
+.game-title { font-size: 48px; font-weight: bold; color: #d60000; text-shadow: 2px 2px #000; letter-spacing: 2px; }
+.card-pile-placeholder { width: 150px; height: 100px; border: 2px dashed #555; display: flex; flex-direction:column; align-items: center; justify-content: center; text-align: center; border-radius: 8px; background-color: #f0f0f0; font-weight: 500; }
+.card-piles-container { display: flex; justify-content: space-around; width: 100%; }
 
-/* Center Area of the Board */
-.center-area {
-    grid-column: 2 / span 9; /* Span 9 columns from the 2nd column */
-    grid-row: 2 / span 9;    /* Span 9 rows from the 2nd row */
-    background-color: #ddebe0; /* Slightly different green for center */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around; /* Distribute title and card piles */
-    border: 2px solid black;
-    padding: 20px;
-}
-.game-title {
-    font-size: 48px;
-    font-weight: bold;
-    color: #d60000; /* Monopoly Red */
-    text-shadow: 2px 2px #000; /* Simple text shadow */
-    letter-spacing: 2px;
-}
-.card-pile-placeholder {
-    width: 150px;
-    height: 100px;
-    border: 2px dashed #555;
-    display: flex;
-    flex-direction:column; /* Stack text and count */
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border-radius: 8px;
-    background-color: #f0f0f0;
-    font-weight: 500;
-}
-.card-piles-container {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
+/* Property Color Definitions (Identical to previous version) */
+.brown { background-color: #955436; } .light-blue { background-color: #aae0fa; } .pink { background-color: #d93a96; } .orange { background-color: #f7941d; } .red { background-color: #ed1b24; } .yellow { background-color: #fff200; } .green { background-color: #1fb25a; } .dark-blue { background-color: #0072bb; }
 
-/* Property Color Definitions */
-.brown { background-color: #955436; }
-.light-blue { background-color: #aae0fa; }
-.pink { background-color: #d93a96; }
-.orange { background-color: #f7941d; }
-.red { background-color: #ed1b24; }
-.yellow { background-color: #fff200; }
-.green { background-color: #1fb25a; }
-.dark-blue { background-color: #0072bb; }
+/* Utility, Station, Tax, Chance, Community Chest Icons (Identical to previous version) */
+.station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon { font-size: 20px; margin-bottom: 3px; }
+.station-icon::before { content: "🚂"; } .utility-icon.electric::before { content: "💡"; } .utility-icon.water::before { content: "💧"; } .tax-icon.income::before { content: "💸"; } .tax-icon.super::before { content: "💎"; } .chance-icon::before { content: "❓"; } .community-chest-icon::before { content: "🎁"; }
 
-/* Utility, Station, Tax, Chance, Community Chest Icons */
-.station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon {
-    font-size: 20px; /* Size of emoji icons */
-    margin-bottom: 3px; /* Space below icon */
-}
-.station-icon::before { content: "🚂"; }
-.utility-icon.electric::before { content: "💡"; }
-.utility-icon.water::before { content: "💧"; }
-.tax-icon.income::before { content: "💸"; }
-.tax-icon.super::before { content: "💎"; }
-.chance-icon::before { content: "❓"; }
-.community-chest-icon::before { content: "🎁"; }
+/* Game Controls & Player Info Area Styles (Identical to previous version) */
+.game-controls { background-color: #f0e6d2; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 100%; max-width: 800px; margin-top: 20px; text-align: center; }
+.player-info-container { display: flex; justify-content: space-around; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+.player-info { background-color: #fff; border: 2px solid #ccc; padding: 10px 15px; border-radius: 8px; min-width: 160px; text-align: left; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
+.player-info.active-player { border-color: #d60000; box-shadow: 0 0 10px #d60000; }
+.player-info h3 { margin-top: 0; font-size: 1.1em; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; }
+.player-info p { font-size: 0.9em; margin: 4px 0; }
+.dice-area { margin: 15px 0; }
+.dice-area span { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; border: 1px solid #333; background-color: white; font-size: 20px; font-weight: bold; margin: 0 5px; border-radius: 5px; }
+#rollDiceButton, #managePropertiesButton, .modal-button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin: 5px;}
+#rollDiceButton:hover, #managePropertiesButton:hover, .modal-button:hover { background-color: #45a049; }
+#rollDiceButton:disabled, #managePropertiesButton:disabled, .modal-button:disabled { background-color: #ccc; cursor: not-allowed; }
+.modal-button.secondary { background-color: #f44336; }
+.modal-button.secondary:hover { background-color: #d32f2f; }
+.message-log { margin-top: 15px; padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; min-height: 50px; text-align: left; font-size: 0.9em; max-height: 100px; overflow-y: auto;}
 
-/* Game Controls & Player Info Area Styles */
-.game-controls {
-    background-color: #f0e6d2; /* Creamy background for controls */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    width: 100%;
-    max-width: 800px; /* Match board width */
-    margin-top: 20px; /* Space above controls */
-    text-align: center;
-}
-.player-info-container {
-    display: flex;
-    justify-content: space-around; /* Distribute player info boxes */
-    margin-bottom: 15px;
-    flex-wrap: wrap; /* Allow player boxes to wrap on smaller screens */
-    gap: 10px; /* Space between player info boxes */
-}
-.player-info {
-    background-color: #fff;
-    border: 2px solid #ccc;
-    padding: 10px 15px;
-    border-radius: 8px;
-    min-width: 160px; /* Minimum width for player info */
-    text-align: left;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.1); /* Inner shadow */
-}
-.player-info.active-player {
-    border-color: #d60000; /* Highlight active player */
-    box-shadow: 0 0 10px #d60000; /* Glow effect for active player */
-}
-.player-info h3 {
-    margin-top: 0;
-    font-size: 1.1em;
-    font-weight: 600;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-    margin-bottom: 8px;
-}
-.player-info p {
-    font-size: 0.9em;
-    margin: 4px 0; /* Spacing for paragraphs in player info */
-}
-.dice-area {
-    margin: 15px 0;
-}
-.dice-area span {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    border: 1px solid #333;
-    background-color: white;
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0 5px;
-    border-radius: 5px;
-}
-#rollDiceButton, .modal-button {
-    background-color: #4CAF50; /* Green for primary buttons */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    margin: 5px; /* Margin around buttons */
-}
-#rollDiceButton:hover, .modal-button:hover {
-    background-color: #45a049; /* Darker green on hover */
-}
-#rollDiceButton:disabled, .modal-button:disabled {
-    background-color: #ccc; /* Grey out disabled buttons */
-    cursor: not-allowed;
-}
-.modal-button.secondary {
-    background-color: #f44336; /* Red for secondary/cancel buttons */
-}
-.modal-button.secondary:hover {
-    background-color: #d32f2f; /* Darker red on hover */
-}
-.message-log {
-    margin-top: 15px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    min-height: 50px; /* Minimum height for the log */
-    text-align: left;
-    font-size: 0.9em;
-    max-height: 100px; /* Limit height and enable scroll */
-    overflow-y: auto; /* Add scrollbar if content exceeds max-height */
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed; /* Cover the whole screen */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-    display: flex; /* Use flexbox for centering */
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* Ensure modal is on top */
-    opacity: 0; /* Start hidden */
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
-}
-.modal-overlay.visible {
-    opacity: 1; /* Make visible */
-    visibility: visible;
-}
-.modal-content {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-    width: 90%; /* Responsive width */
-    max-width: 450px; /* Max width for larger screens */
-    text-align: center;
-    transform: translateY(-50px) scale(0.95); /* Initial state for animation */
-    transition: transform 0.3s ease-out; /* Animation for appearing */
-    border-top: 10px solid #d60000; /* Monopoly Red accent */
-}
-.modal-overlay.visible .modal-content {
-    transform: translateY(0) scale(1); /* Final state for animation */
-}
-.modal-title {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
-}
-.modal-message {
-    font-size: 1.1em;
-    color: #555;
-    margin-bottom: 20px;
-    line-height: 1.6;
-}
-.modal-buttons {
-    display: flex;
-    flex-direction: column; /* Stack jail options vertically */
-    justify-content: center;
-    gap: 10px; /* Space between buttons */
-    flex-wrap: wrap; /* Allow buttons to wrap if needed */
-}
+/* Modal Styles (Identical to previous version) */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.modal-overlay.visible { opacity: 1; visibility: visible; }
+.modal-content { background-color: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); width: 90%; max-width: 450px; text-align: center; transform: translateY(-50px) scale(0.95); transition: transform 0.3s ease-out; border-top: 10px solid #d60000; }
+.modal-overlay.visible .modal-content { transform: translateY(0) scale(1); }
+.modal-title { font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 15px; }
+.modal-message { font-size: 1.1em; color: #555; margin-bottom: 20px; line-height: 1.6; }
+.modal-buttons { display: flex; flex-direction: column; justify-content: center; gap: 10px; flex-wrap: wrap; }
