@@ -7,16 +7,17 @@ body {
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
-    padding: 20px;
+    padding: 10px;
     margin: 0;
-    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .game-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
+    width: 100%;
 }
 
 /* Board Layout Styles */
@@ -24,179 +25,371 @@ body {
     display: grid;
     grid-template-columns: 100px repeat(9, 65px) 100px;
     grid-template-rows: 100px repeat(9, 65px) 100px;
-    gap: 2px;
-    border: 3px solid black;
-    background-color: #f7f7f7;
-    width: 802px;
-    height: 802px;
+    gap: 1px; /* Minimal gap */
+    border: 2px solid black;
+    background-color: #f0f0f0; /* Board background */
+    width: calc(2 * 100px + 9 * 65px + 10 * 1px);
+    height: calc(2 * 100px + 9 * 65px + 10 * 1px);
     position: relative;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
 
 /* Individual Space Styles */
 .space {
-    background-color: #f7f7f7;
-    border: 1px solid #333;
+    background-color: #f7f7f7; /* Default space background */
+    border: 1px solid #6c6c6c; /* Slightly darker border for spaces */
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column; /* Main axis for stacking content, house-display, token-container, owner-marker */
+    align-items: stretch; /* Stretch children to fill width */
+    justify-content: flex-start;
     text-align: center;
-    font-size: 9px;
-    line-height: 1.2;
+    font-size: 8px; /* Base font for properties */
+    line-height: 1.15;
     position: relative;
-    padding: 1px;
+    padding: 0; /* No padding on the space itself; manage inside .content */
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: hidden; /* Crucial */
 }
 
+/* The .content div will handle the direct layout of property info, icons, etc. */
 .space .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 65%; /* Adjusted to make space for house display */
     width: 100%;
+    height: 100%; /* Takes full space of the cell by default */
+    display: flex;
+    flex-direction: column; /* Default for bottom row, name above price */
+    align-items: center;   /* Center content horizontally */
+    justify-content: flex-start; /* Align to the "top" of the cell */
+    padding: 2px; /* Uniform padding inside the content area */
+    box-sizing: border-box;
+    position: relative; /* For absolute positioning if needed, but aiming for flex */
 }
 
+/* Property Specific Styles - Applied to .space.property */
+.property .color-bar {
+    height: 15px; /* Consistent height for the color bar */
+    width: 100%;  /* Full width of its container by default */
+    flex-shrink: 0; /* Prevent shrinking */
+    margin: 0;
+    /* Background color will be set by .brown, .light-blue etc. */
+}
+
+.property .name {
+    flex-grow: 1; /* Allow name to take available space */
+    display: flex;
+    align-items: center; /* Vertically center text in its allocated space */
+    justify-content: center; /* Horizontally center text */
+    font-weight: 500;
+    width: 100%; /* Take full width */
+    padding: 1px 0;
+    line-height: 1.1; /* Adjust for multiple lines */
+    overflow-wrap: break-word; /* Allow long names to wrap */
+}
+
+.property .price {
+    font-weight: 600;
+    width: 100%; /* Full width */
+    padding-bottom: 1px; /* Small padding at bottom */
+    flex-shrink: 0;
+}
+
+/* Elements below the main content (house display, tokens, owner) */
 .house-hotel-display {
-    height: 10%; /* Space for house/hotel icons */
+    height: 10px; /* Fixed small height */
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px; /* Adjust size of house/hotel emojis */
+    font-size: 9px;
     line-height: 1;
-    overflow: hidden; /* Prevent too many emojis from breaking layout */
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex-shrink: 0;
+    position: absolute; /* Position relative to .space */
+    bottom: 22px; /* Position above token container and owner marker */
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.5); /* Optional: slight bg for visibility */
+    z-index: 1; /* Ensure it's above other content if overlapping */
 }
-
 
 .space .token-container {
+    height: 18px; /* Fixed height */
     width: 100%;
-    height: 20%; /* Adjusted */
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 1px;
+    gap: 1px;
+    flex-shrink: 0;
+    position: absolute; /* Position relative to .space */
+    bottom: 4px; /* Position above owner marker */
+    left: 0;
+    z-index: 1;
 }
 
 .player-token {
-    width: 22px;
-    height: 22px;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(0,0,0,0.2);
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    line-height: 1;
+    width: 14px; height: 14px; font-size: 10px;
+    border-radius: 2px; background-color: white; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    display: flex; align-items: center; justify-content: center; line-height: 1;
 }
 
 .owner-marker-container {
-    height: 5%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+    height: 4px; width: 100%; flex-shrink: 0;
+    position: absolute; /* Position relative to .space */
+    bottom: 0;
+    left: 0;
+    display: flex; /* To center the marker if it wasn't 100% width */
     align-items: flex-end;
+    z-index: 0;
+}
+.owner-marker { width: 100%; height: 100%; background-color: transparent; }
+
+
+/* --- Base styling for .content elements (icons, non-property text) --- */
+.space .content > div:not(.color-bar):not(.name):not(.price) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1; /* Allow these to take space */
 }
 
-.owner-marker {
-    width: 80%;
-    height: 5px;
-    border-top: 1px solid black;
-    background-color: transparent;
+/* Icons for utility spaces */
+.station-icon::before {
+    content: "🚂";
+    font-size: 20px;
+    line-height: 1;
 }
 
-/* Corner Space Styles */
-.corner {
-    font-weight: bold;
-    font-size: 14px;
+.utility-icon.electric::before {
+    content: "💡";
+    font-size: 20px;
+    line-height: 1;
 }
-.corner .content { height: 80%; } /* Corners don't have house display usually */
-.corner .token-container { height: 20%; }
 
-/* Property Specific Styles */
-.property .color-bar {
-    height: 15px;
-    width: 100%;
-    border-bottom: 1px solid #333;
-    margin-bottom: 1px;
+.utility-icon.water::before {
+    content: "💧";
+    font-size: 20px;
+    line-height: 1;
 }
-.property .name {
-    flex-grow: 1;
+
+.tax-icon.income::before {
+    content: "💰";
+    font-size: 20px;
+    line-height: 1;
+}
+
+.tax-icon.super::before {
+    content: "💸";
+    font-size: 20px;
+    line-height: 1;
+}
+
+.chance-icon::before {
+    content: "❓";
+    font-size: 20px;
+    line-height: 1;
+}
+
+.community-chest-icon::before {
+    content: "📦";
+    font-size: 20px;
+    line-height: 1;
+}
+
+.station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon {
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1px 0;
-    font-weight: 500;
-    width: 100%;
-}
-.property .price {
-    font-weight: 600;
-    margin-top: 1px;
 }
 
-/* Grid Position CSS (Identical to previous version) */
+
+/* === ROW/COLUMN SPECIFIC STYLING === */
+
+/* BOTTOM ROW (No rotation for .content) - e.g. space-old-kent-road */
+.property:not(.left-col):not(.top-row):not(.right-col) .content {
+    flex-direction: column; /* color-bar, then name, then price */
+    justify-content: flex-start;
+    padding-top: 0; /* Color bar touches top */
+}
+.property:not(.left-col):not(.top-row):not(.right-col) .color-bar {
+    order: -1; /* Ensures it's first */
+    height: 15px;
+    border-bottom: 1px solid #333; /* Separator */
+}
+.property:not(.left-col):not(.top-row):not(.right-col) .name {
+    padding: 2px; /* Give name some breathing room */
+}
+.property:not(.left-col):not(.top-row):not(.right-col) .price {
+    margin-top: auto; /* Push price to bottom of its flex container */
+}
+
+
+/* TOP ROW - e.g. space-strand */
+.top-row .content { /* This rotates the whole content block */
+    transform: rotate(180deg);
+    transform-origin: center center;
+}
+.top-row.property .content { /* Specific for properties in top row */
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 0;
+}
+.top-row.property .color-bar {
+    order: -1; /* Will be visually at the "top" (bottom edge towards green) */
+    height: 15px;
+    border-bottom: 1px solid #333; /* This border will be visually "above" it */
+}
+.top-row.property .name {
+     padding: 2px;
+}
+.top-row.property .price {
+    margin-top: auto;
+}
+/* Non-property content in top row also gets rotated by .top-row .content */
+
+
+/* LEFT COLUMN - e.g. space-pall-mall */
+.left-col .content { /* Rotates the whole content block */
+    transform: rotate(90deg); /* CHANGE: Reversed rotation direction */
+    transform-origin: center center;
+    /* The content div itself now has its width as the visual height, and height as visual width */
+    /* We need to ensure its children are laid out for this new perspective */
+}
+.left-col.property .content {
+    flex-direction: column; /* CHANGE: Reversed to column */
+    justify-content: flex-start; /* Color bar at "top" of this new column */
+    padding-top: 0; /* Color bar flush */
+}
+.left-col.property .color-bar {
+    order: -1; /* Color bar first */
+    width: 100%; /* It spans the new "width" (original height of cell) */
+    height: 15px; /* This is its thickness */
+    border-bottom: 1px solid #333; /* Border towards text */
+}
+.left-col.property .name {
+    flex-grow: 1;
+    padding: 2px;
+}
+.left-col.property .price {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* CHANGE: Special treatment for the utility spaces in the left column */
+.left-col.space-electric-company .content,
+.left-col.space-marylebone-station .content {
+    display: flex;
+    flex-direction: column; /* Put icon at the bottom (visually top) */
+}
+
+.left-col.space-electric-company .price,
+.left-col.space-marylebone-station .price {
+    order: 1; /* Move price to the top (visually bottom) */
+    margin-bottom: 5px; /* Add space between price and icon */
+}
+
+
+/* RIGHT COLUMN - e.g. space-regent-street */
+.right-col .content { /* Rotates the whole content block */
+    transform: rotate(-90deg);
+    transform-origin: center center;
+}
+.right-col.property .content {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 0; /* Color bar flush */
+}
+.right-col.property .color-bar {
+    order: -1;
+    width: 100%;
+    height: 15px;
+    border-bottom: 1px solid #333;
+}
+.right-col.property .name {
+    flex-grow: 1;
+    padding: 2px;
+}
+.right-col.property .price {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+
+/* Special care for icons to stay upright in rotated contexts */
+.left-col .station-icon::before, 
+.left-col .utility-icon::before, 
+.left-col .tax-icon::before, 
+.left-col .chance-icon::before, 
+.left-col .community-chest-icon::before {
+    transform: rotate(360deg); /* CHANGE: Adjusted to match new rotation */
+}
+
+.right-col .station-icon::before, 
+.right-col .utility-icon::before, 
+.right-col .tax-icon::before, 
+.right-col .chance-icon::before, 
+.right-col .community-chest-icon::before {
+    transform: rotate(90deg);
+}
+
+.top-row .station-icon::before, 
+.top-row .utility-icon::before, 
+.top-row .tax-icon::before, 
+.top-row .chance-icon::before, 
+.top-row .community-chest-icon::before {
+    transform: rotate(180deg);
+}
+
+
+/* Grid Position CSS (Keep as is) */
 .row-1 { grid-row: 1; } .row-11 { grid-row: 11; } .col-1 { grid-column: 1; } .col-11 { grid-column: 11; }
 .space-go { grid-column: 11; grid-row: 11; } .space-old-kent-road { grid-column: 10; grid-row: 11; } .space-community-chest-bottom { grid-column: 9; grid-row: 11; } .space-whitechapel-road { grid-column: 8; grid-row: 11; } .space-income-tax { grid-column: 7; grid-row: 11; } .space-kings-cross { grid-column: 6; grid-row: 11; } .space-the-angel-islington { grid-column: 5; grid-row: 11; } .space-chance-bottom { grid-column: 4; grid-row: 11; } .space-euston-road { grid-column: 3; grid-row: 11; } .space-pentonville-road { grid-column: 2; grid-row: 11; } .space-jail { grid-column: 1; grid-row: 11; }
 .space-pall-mall { grid-column: 1; grid-row: 10; } .space-electric-company { grid-column: 1; grid-row: 9; } .space-whitehall { grid-column: 1; grid-row: 8; } .space-northumberland-avenue { grid-column: 1; grid-row: 7; } .space-marylebone-station { grid-column: 1; grid-row: 6; } .space-bow-street { grid-column: 1; grid-row: 5; } .space-community-chest-left { grid-column: 1; grid-row: 4; } .space-marlborough-street { grid-column: 1; grid-row: 3; } .space-vine-street { grid-column: 1; grid-row: 2; }
 .space-free-parking { grid-column: 1; grid-row: 1; } .space-strand { grid-column: 2; grid-row: 1; } .space-chance-top { grid-column: 3; grid-row: 1; } .space-fleet-street { grid-column: 4; grid-row: 1; } .space-trafalgar-square { grid-column: 5; grid-row: 1; } .space-fenchurch-st-station { grid-column: 6; grid-row: 1; } .space-leicester-square { grid-column: 7; grid-row: 1; } .space-coventry-street { grid-column: 8; grid-row: 1; } .space-water-works { grid-column: 9; grid-row: 1; } .space-piccadilly { grid-column: 10; grid-row: 1; } .space-go-to-jail { grid-column: 11; grid-row: 1; }
 .space-regent-street { grid-column: 11; grid-row: 2; } .space-oxford-street { grid-column: 11; grid-row: 3; } .space-community-chest-right { grid-column: 11; grid-row: 4; } .space-bond-street { grid-column: 11; grid-row: 5; } .space-liverpool-st-station { grid-column: 11; grid-row: 6; } .space-chance-right { grid-column: 11; grid-row: 7; } .space-park-lane { grid-column: 11; grid-row: 8; } .space-super-tax { grid-column: 11; grid-row: 9; } .space-mayfair { grid-column: 11; grid-row: 10; }
 
-/* Text Rotation Styles (Identical to previous version) */
-.left-col .content .name, .right-col .content .name, .left-col .content .price, .right-col .content .price, .left-col.space .content > div:not(.color-bar):not(.name):not(.price):not(.station-icon):not(.utility-icon):not(.tax-icon):not(.chance-icon):not(.community-chest-icon), .right-col.space .content > div:not(.color-bar):not(.name):not(.price):not(.station-icon):not(.utility-icon):not(.tax-icon):not(.chance-icon):not(.community-chest-icon) { font-size: 7.5px; line-height: 1.1; }
-.left-col .content .name, .right-col .content .name { text-align: center; white-space: normal; width: 22px; margin: 1px 0; }
-.left-col.space .content { transform: rotate(90deg); } .right-col.space .content { transform: rotate(-90deg); } .top-row.space .content { transform: rotate(180deg); }
-.left-col.space .content .station-icon, .left-col.space .content .utility-icon, .left-col.space .content .tax-icon, .left-col.space .content .chance-icon, .left-col.space .content .community-chest-icon, .right-col.space .content .station-icon, .right-col.space .content .utility-icon, .right-col.space .content .tax-icon, .right-col.space .content .chance-icon, .right-col.space .content .community-chest-icon, .top-row.space .content .station-icon, .top-row.space .content .utility-icon, .top-row.space .content .tax-icon, .top-row.space .content .chance-icon, .top-row.space .content .community-chest-icon { transform: rotate(0deg) !important; }
-.left-col .content .price, .right-col .content .price, .top-row .content .price { transform: none !important; }
 
-/* Corner Specific Text/Icon Adjustments (Identical to previous version) */
+/* Corner Specific Text/Icon Adjustments (Keep as is) */
+.corner .content { padding: 5px; } /* More padding for corner content */
+.corner .house-hotel-display { display: none; }
+.corner .owner-marker-container { display: none; }
 .space-jail .just { position: absolute; top: 15px; left: 5px; transform: rotate(45deg); font-size: 10px;}
 .space-jail .visiting { position: absolute; bottom: 15px; right: 5px; transform: rotate(45deg); font-size: 10px;}
-.space-jail .jail-icon-container { font-size:30px; border: 3px solid black; padding:10px; margin-top:10px; margin-bottom:10px; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;}
-.space-free-parking .parking-icon-container { font-size: 30px; }
-.space-go-to-jail .go-to-jail-icon-container { font-size: 30px; }
+.space-jail .jail-icon-container { font-size:30px; border: 3px solid black; padding:10px; margin:10px auto; width: 60%; height: 60%; display:flex; align-items:center; justify-content:center;}
+.space-free-parking .parking-icon-container { font-size: 30px; margin: auto; }
+.space-go-to-jail .go-to-jail-icon-container { font-size: 30px; margin: auto; }
 .space-go .arrow { font-size: 30px; color: #d60000; line-height: 1; }
 
-/* Center Area of the Board (Identical to previous version) */
+
+/* Center Area of the Board (Keep as is) */
 .center-area { grid-column: 2 / span 9; grid-row: 2 / span 9; background-color: #ddebe0; display: flex; flex-direction: column; align-items: center; justify-content: space-around; border: 2px solid black; padding: 20px; }
 .game-title { font-size: 48px; font-weight: bold; color: #d60000; text-shadow: 2px 2px #000; letter-spacing: 2px; }
 .card-pile-placeholder { width: 150px; height: 100px; border: 2px dashed #555; display: flex; flex-direction:column; align-items: center; justify-content: center; text-align: center; border-radius: 8px; background-color: #f0f0f0; font-weight: 500; }
 .card-piles-container { display: flex; justify-content: space-around; width: 100%; }
 
-/* Property Color Definitions (Identical to previous version) */
+/* Property Color Definitions (Keep as is) */
 .brown { background-color: #955436; } .light-blue { background-color: #aae0fa; } .pink { background-color: #d93a96; } .orange { background-color: #f7941d; } .red { background-color: #ed1b24; } .yellow { background-color: #fff200; } .green { background-color: #1fb25a; } .dark-blue { background-color: #0072bb; }
 
-/* Utility, Station, Tax, Chance, Community Chest Icons (Identical to previous version) */
-.station-icon, .utility-icon, .tax-icon, .chance-icon, .community-chest-icon { font-size: 20px; margin-bottom: 3px; }
-.station-icon::before { content: "🚂"; } .utility-icon.electric::before { content: "💡"; } .utility-icon.water::before { content: "💧"; } .tax-icon.income::before { content: "💸"; } .tax-icon.super::before { content: "💎"; } .chance-icon::before { content: "❓"; } .community-chest-icon::before { content: "🎁"; }
-
-/* Game Controls & Player Info Area Styles (Identical to previous version) */
-.game-controls { background-color: #f0e6d2; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 100%; max-width: 800px; margin-top: 20px; text-align: center; }
-.player-info-container { display: flex; justify-content: space-around; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-.player-info { background-color: #fff; border: 2px solid #ccc; padding: 10px 15px; border-radius: 8px; min-width: 160px; text-align: left; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
-.player-info.active-player { border-color: #d60000; box-shadow: 0 0 10px #d60000; }
-.player-info h3 { margin-top: 0; font-size: 1.1em; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; }
-.player-info p { font-size: 0.9em; margin: 4px 0; }
-.dice-area { margin: 15px 0; }
-.dice-area span { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; border: 1px solid #333; background-color: white; font-size: 20px; font-weight: bold; margin: 0 5px; border-radius: 5px; }
-#rollDiceButton, #managePropertiesButton, .modal-button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin: 5px;}
+/* Game Controls & Player Info Area Styles (Keep as is) */
+.game-controls { background-color: #f0e6d2; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); width: calc(2 * 100px + 9 * 65px + 10 * 1px); margin-top: 15px; text-align: center; box-sizing: border-box; }
+.player-info-container { display: flex; justify-content: space-around; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.player-info { background-color: #fff; border: 2px solid #ccc; padding: 8px 10px; border-radius: 6px; min-width: 140px; text-align: left; box-shadow: inset 0 0 4px rgba(0,0,0,0.05); }
+.player-info.active-player { border-color: #d60000; box-shadow: 0 0 8px rgba(214,0,0,0.5); }
+.player-info h3 { margin-top: 0; font-size: 0.95em; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 3px; margin-bottom: 5px; }
+.player-info p { font-size: 0.8em; margin: 2px 0; }
+.dice-area { margin: 10px 0; }
+.dice-area span { display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; border: 1px solid #333; background-color: white; font-size: 16px; font-weight: bold; margin: 0 3px; border-radius: 4px; }
+#rollDiceButton, #managePropertiesButton, .modal-button { background-color: #4CAF50; color: white; padding: 8px 14px; border: none; border-radius: 4px; font-size: 0.9em; cursor: pointer; transition: background-color 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin: 4px;}
 #rollDiceButton:hover, #managePropertiesButton:hover, .modal-button:hover { background-color: #45a049; }
 #rollDiceButton:disabled, #managePropertiesButton:disabled, .modal-button:disabled { background-color: #ccc; cursor: not-allowed; }
 .modal-button.secondary { background-color: #f44336; }
 .modal-button.secondary:hover { background-color: #d32f2f; }
-.message-log { margin-top: 15px; padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; min-height: 50px; text-align: left; font-size: 0.9em; max-height: 100px; overflow-y: auto;}
+.message-log { margin-top: 10px; padding: 8px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; min-height: 35px; text-align: left; font-size: 0.8em; max-height: 80px; overflow-y: auto;}
 
-/* Modal Styles (Identical to previous version) */
+/* Modal Styles (Keep as is) */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
 .modal-overlay.visible { opacity: 1; visibility: visible; }
-.modal-content { background-color: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); width: 90%; max-width: 450px; text-align: center; transform: translateY(-50px) scale(0.95); transition: transform 0.3s ease-out; border-top: 10px solid #d60000; }
+.modal-content { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); width: 90%; max-width: 400px; text-align: center; transform: translateY(-40px) scale(0.95); transition: transform 0.3s ease-out; border-top: 8px solid #d60000; }
 .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); }
-.modal-title { font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 15px; }
-.modal-message { font-size: 1.1em; color: #555; margin-bottom: 20px; line-height: 1.6; }
-.modal-buttons { display: flex; flex-direction: column; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.modal-title { font-size: 1.6em; font-weight: bold; color: #333; margin-bottom: 12px; }
+.modal-message { font-size: 1em; color: #555; margin-bottom: 18px; line-height: 1.5; }
+.modal-buttons { display: flex; flex-direction: column; justify-content: center; gap: 8px; flex-wrap: wrap; }
