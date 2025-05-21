@@ -328,7 +328,7 @@ body {
 .right-col .tax-icon::before, 
 .right-col .chance-icon::before, 
 .right-col .community-chest-icon::before {
-    transform: rotate(90deg);
+    transform: rotate(360deg);
 }
 
 .top-row .station-icon::before, 
